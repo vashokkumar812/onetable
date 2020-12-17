@@ -18,3 +18,80 @@
 <p>App details works!</p>
 
 {% endblock %}
+
+{% block extrajs %}
+<script>
+  // Get dashboard page 1
+  (function($) {
+    $('#activity').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "{% url 'activity' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data.html);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+  // Get dashboard page 2
+  (function($) {
+    $('#tasks').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: "{% url 'tasks' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data.html);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+  // Get dashboard page 3
+  (function($) {
+    $('#addMenu').on('click', function(e) {
+        e.preventDefault();
+        // Show the input box
+        $('#addMenuInput').removeClass('d-none')
+    });
+  }(jQuery));
+
+  // Get dashboard page 3
+  (function($) {
+    $('#').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: "{% url 'notes' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data.html);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+</script>
+{% endblock %}

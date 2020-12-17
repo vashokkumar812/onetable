@@ -199,12 +199,107 @@ def app_details(request, organization_pk, app_pk):
     return render(request, 'home/app-details.html', context=context)
 
 
+@login_required
+def add_menu(request, organization_pk, app_pk):
+
+    if request.is_ajax and request.method == "POST":
+
+        organization = get_object_or_404(Organization, pk=organization_pk)
+        app = get_object_or_404(App, pk=app_pk)
+        menu_name = request.POST.get('menu_name', None)
+
+        menu = Menu.objects.create(
+            name=section_name,
+            app=app,
+            status='active',
+            order=0,
+            created_at = timezone.now(),
+            created_user=request.user)
+        menu.save();
+
+        menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
+
+        html = render_to_string(
+            template_name="menu-list.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'menus': menus
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+def edit_menu(request, organization_pk, app_pk, menu_pk):
+
+    if request.is_ajax and request.method == "POST":
+
+        name = request.POST.get('menu_name', 'empty')
+        menu = get_object_or_404(Menu, pk=menu_pk)
+        menu.name = name
+        menu.save()
+
+        menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
+
+        html = render_to_string(
+            template_name="menu-list.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'menus': menus
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+def archive_menu(request, organization_pk, app_pk, menu_pk):
+
+    if request.is_ajax and request.method == "POST":
+
+        menu = get_object_or_404(Menu, pk=menu_pk)
+
+        manu.status = "archived"
+        menu.save()
+
+        menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
+
+        html = render_to_string(
+            template_name="menu-list.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'menus': menus
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+
+def create_list(request, organization_pk, app_pk, menu_id):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+
+    context = {
+        'organization': organization,
+        'app': app
+    }
+
+    return render(request, 'home/create_list.html', context=context)
+
+
 #===============================================================================
 # App
 #===============================================================================
 
 @login_required
-def activity(request):
+def activity(request, organization_pk, app_pk):
 
     html = loader.render_to_string(
         'home/activity.html'
@@ -216,7 +311,7 @@ def activity(request):
     return JsonResponse(output_data)
 
 @login_required
-def tasks(request):
+def tasks(request, organization_pk, app_pk):
 
     html = loader.render_to_string(
         'home/tasks.html'
@@ -228,10 +323,22 @@ def tasks(request):
     return JsonResponse(output_data)
 
 @login_required
-def lists(request):
+def notes(request, organization_pk, app_pk):
 
     html = loader.render_to_string(
-        'home/lists.html'
+        'home/notes.html'
+    )
+    # package output data and return it as a JSON object
+    output_data = {
+        'html': html
+    }
+    return JsonResponse(output_data)
+
+@login_required
+def lists(request, organization_pk, app_pk, menu_id):
+
+    html = loader.render_to_string(
+        'home/notes.html'
     )
     # package output data and return it as a JSON object
     output_data = {

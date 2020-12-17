@@ -109,3 +109,50 @@ class AppUser(models.Model):
         blank=False,
         default='active',
     )
+
+class Menu(models.Model):
+    name = models.CharField(max_length=200)
+    app = models.ForeignKey('App', on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+    order = models.IntegerField()
+
+    MENU_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=MENU_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return self.name
+
+class List(models.Model):
+    name = models.CharField(max_length=200)
+    app = models.ForeignKey('App', on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    LIST_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=LIST_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return self.name
