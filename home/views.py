@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
-from .models import Organization, OrganizationUser, App, AppUser
+from .models import Organization, OrganizationUser, App, AppUser, Menu
 from .forms import OrganizationForm, AppForm
 
 #===============================================================================
@@ -190,10 +190,11 @@ def app_details(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
-    #Lists should go here at some point
+    menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
     context = {
         'organization': organization,
-        'app': app
+        'app': app,
+        'menus': menus
     }
 
     return render(request, 'home/app-details.html', context=context)
@@ -209,7 +210,7 @@ def add_menu(request, organization_pk, app_pk):
         menu_name = request.POST.get('menu_name', None)
 
         menu = Menu.objects.create(
-            name=section_name,
+            name=menu_name,
             app=app,
             status='active',
             order=0,
@@ -220,7 +221,7 @@ def add_menu(request, organization_pk, app_pk):
         menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
 
         html = render_to_string(
-            template_name="menu-list.html",
+            template_name="home/menu-list.html",
             context={
                 'organization': organization,
                 'app': app,

@@ -65,16 +65,7 @@
 
   // Get dashboard page 3
   (function($) {
-    $('#addMenu').on('click', function(e) {
-        e.preventDefault();
-        // Show the input box
-        $('#addMenuInput').removeClass('d-none')
-    });
-  }(jQuery));
-
-  // Get dashboard page 3
-  (function($) {
-    $('#').on('click', function(e) {
+    $('#notes').on('click', function(e) {
         e.preventDefault();
         $.ajax({
           type: "POST",
@@ -90,6 +81,61 @@
                 // shit happens friends!
             }
         });
+    });
+  }(jQuery));
+
+  // Get dashboard page 3
+  (function($) {
+    $('#addMenu').on('click', function(e) {
+        e.preventDefault();
+        // Show the input box
+        $('#addMenuInput').removeClass('d-none')
+    });
+  }(jQuery));
+
+  // Get dashboard page 3
+  (function($) {
+    $('#saveMenu').on('click', function(e) {
+        e.preventDefault();
+        // Show the input box
+
+        // Get form fields
+        var menu_name = $('input[name=menuName]').val();
+
+        // Validate form fields
+        if (menu_name != "") {
+          // Send in the request
+          var formData = {
+              'menu_name': menu_name,
+              'csrfmiddlewaretoken': window.CSRF_TOKEN
+          };
+
+          // process the form
+          $.ajax({
+              type: "POST",
+              url: "{% url 'add_menu' organization_pk=organization.pk app_pk=app.pk %}",
+              data: formData,
+              dataType: "json",
+              encode: true
+          }).done(function(data) {
+
+              console.log(data)
+              $('#menu-lists').html(data['html_from_view'])
+              $('#menuName').val("")
+
+          }).fail(function(xhr, status, error) {
+            //Ajax request failed.
+            var errorMessage = xhr.status + ': ' + xhr.statusText
+            alert('Error - ' + errorMessage);
+
+          });
+
+          return false;
+
+       } else {
+
+         // The user provided an empty value, show form error
+       }
     });
   }(jQuery));
 
