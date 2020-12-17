@@ -1,0 +1,21 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}
+    OneTable - Dashboard
+{% endblock %}
+
+{% block topbar %}
+  {% include "home/header-dashboard.html" %}
+{% endblock %}
+
+{% block content %}
+
+{# Initially load default page-1 #}
+<div id="page-content">{% include 'home/activity.html' %}</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

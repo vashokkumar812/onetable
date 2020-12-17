@@ -1,0 +1,14 @@
+{% if organizations %}
+<div class="row">
+    {% for organization in organizations %}
+    <div class="col-lg-4 mb-5">
+        <a class="card lift h-100" href="{% url 'apps' organization_pk=organization.pk %}">
+          <div class="card-body">
+              <h4 class="card-title mb-2">{{ organization.name }}</h4>
+          </div>
+        </a>
+    </div>
+    {% endfor %}
+  </div>
+  <hr class="mt-5" />
+{% endif %}

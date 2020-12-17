@@ -1,0 +1,38 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}
+    OneTable - Login
+{% endblock %}
+
+{% block topbar %}
+  {% include "home/home-header.html" %}
+{% endblock %}
+
+{% block content %}
+<section class="bg-white mt-10 mb-10">
+  <div class="container">
+      <div class="row justify-content-center">
+          <div class="col-lg-6">
+
+            <h1 class="mb-5">Login</h1>
+
+            <div class="form-group">
+              <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary">Login</button>
+              </form>
+            </div>
+
+            <a href="{% url 'register' %}">Register</a>
+
+            {% if form.errors %}
+              <p>Your username and password didn't match. Please try again.</p>
+            {% endif %}
+
+          </div>
+      </div>
+  </div>
+</section>
+{% endblock %}

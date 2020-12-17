@@ -1,0 +1,15 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}
+    OneTable - Logged Out
+{% endblock %}
+
+{% block topbar %}
+  {% include "home/home-header.html" %}
+{% endblock %}
+
+{% block content %}
+  <p>Logged out!</p>
+  <a href="{% url 'login'%}">Click here to login again.</a>
+{% endblock %}

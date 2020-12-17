@@ -1,0 +1,30 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}
+    OneTable - About
+{% endblock %}
+
+{% block topbar %}
+  {% include "home/app-header.html" %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row my-5">
+  <div class="col-12-lg">
+    <h1>My Organizations</h1>
+  </div>
+</div>
+<div class="row mb-5">
+  <div class="col-12-lg">
+    <a class="btn btn-lg btn-primary font-weight-500" href="{% url 'add_organization' %}">
+      Add Organization
+    </a>
+  </div>
+</div>
+<div id="organizations-list">
+  {% include "home/organizations-list.html" %}
+</div>
+
+{% endblock %}

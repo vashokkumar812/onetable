@@ -1,0 +1,26 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}
+    OneTable - About
+{% endblock %}
+
+{% block topbar %}
+  {% include "home/home-header.html" %}
+{% endblock %}
+
+{% block content %}
+<div class ="row">
+  <div class="col-lg-12">
+    <h1 class="mb-5">Create App</h1>
+    <div class="form-group">
+      <form method="POST">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-lg btn-primary font-weight-500 mr-3">
+          Add App
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
