@@ -91,9 +91,9 @@
                             <!-- Sidenav Menu Heading (Core)-->
                             <div class="sidenav-menu-heading">Activity</div>
                             <!-- Sidenav Accordion (Dashboard)-->
-                            <a class="nav-link" id="activity">
+                            <a class="nav-link" id="dashboard">
                                 <div class="nav-link-icon"><i data-feather="activity"></i></div>
-                                Activity
+                                Dashboard
                             </a>
                             <a class="nav-link" id="tasks">
                                 <div class="nav-link-icon"><i data-feather="activity"></i></div>
@@ -136,14 +136,11 @@
             {% endif %}
             <div id="layoutSidenav_content">
                 <main>
-                  <!-- Main page content-->
-                    <div class="container mt-5">
-                        <div id="main-content">
-                          {% block content %}
+                  <div id="main-content">
+                    {% block content %}
 
-                          {% endblock %}
-                        </div>
-                    </div>
+                    {% endblock %}
+                  </div>
                 </main>
             </div>
         </div>

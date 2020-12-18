@@ -245,7 +245,7 @@ def edit_menu(request, organization_pk, app_pk, menu_pk):
         menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
 
         html = render_to_string(
-            template_name="menu-list.html",
+            template_name="home/menu-list.html",
             context={
                 'organization': organization,
                 'app': app,
@@ -269,7 +269,7 @@ def archive_menu(request, organization_pk, app_pk, menu_pk):
         menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
 
         html = render_to_string(
-            template_name="menu-list.html",
+            template_name="home/menu-list.html",
             context={
                 'organization': organization,
                 'app': app,
@@ -300,10 +300,10 @@ def create_list(request, organization_pk, app_pk, menu_id):
 #===============================================================================
 
 @login_required
-def activity(request, organization_pk, app_pk):
+def dashboard(request, organization_pk, app_pk):
 
     html = loader.render_to_string(
-        'home/activity.html'
+        'home/dashboard.html'
     )
     # package output data and return it as a JSON object
     output_data = {
@@ -336,31 +336,20 @@ def notes(request, organization_pk, app_pk):
     return JsonResponse(output_data)
 
 @login_required
-def lists(request, organization_pk, app_pk, menu_id):
+def lists(request, organization_pk, app_pk):
 
-    html = loader.render_to_string(
-        'home/notes.html'
+    menu_id = request.POST.get('menu_id', 'empty')
+    menu = get_object_or_404(Menu, pk=menu_id)
+
+    print(menu_id)
+
+    html = render_to_string(
+        template_name="home/lists.html",
+        context={
+            'menu': menu
+        }
     )
-    # package output data and return it as a JSON object
-    output_data = {
-        'html': html
-    }
-    return JsonResponse(output_data)
 
-# ------------------------------------------------
+    data_dict = {"html_from_view": html}
 
-def ajaxSample(request):
-
-    if request.is_ajax and request.method == "POST":
-        name = request.POST.get('name', 'empty')
-        print("Request to create organization " + name)
-
-        return redirect('organization_details', organization_pk="123456789")
-        #return redirect('organization_details', organization_pk="123456789")
-
-    else:
-
-        name = request.POST.get('name', 'empty')
-        print("Request to create organization " + name)
-
-        context = {}
+    return JsonResponse(data=data_dict, safe=False)

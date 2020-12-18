@@ -15,19 +15,20 @@
 
 {% block content %}
 
-<p>App details works!</p>
+{% include 'home/dashboard.html' %}
 
 {% endblock %}
 
 {% block extrajs %}
 <script>
-  // Get dashboard page 1
+
+  // Activity page
   (function($) {
-    $('#activity').on('click', function(e) {
+    $('#dashboard').on('click', function(e) {
         e.preventDefault();
         $.ajax({
             type: "POST",
-            url: "{% url 'activity' organization_pk=organization.pk app_pk=app.pk %}",
+            url: "{% url 'dashboard' organization_pk=organization.pk app_pk=app.pk %}",
             data: {
                 'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
             },
@@ -42,7 +43,7 @@
     });
   }(jQuery));
 
-  // Get dashboard page 2
+  // Tasks page
   (function($) {
     $('#tasks').on('click', function(e) {
         e.preventDefault();
@@ -63,7 +64,7 @@
     });
   }(jQuery));
 
-  // Get dashboard page 3
+  // Notes page
   (function($) {
     $('#notes').on('click', function(e) {
         e.preventDefault();
@@ -84,7 +85,6 @@
     });
   }(jQuery));
 
-  // Get dashboard page 3
   (function($) {
     $('#addMenu').on('click', function(e) {
         e.preventDefault();
@@ -93,7 +93,6 @@
     });
   }(jQuery));
 
-  // Get dashboard page 3
   (function($) {
     $('#saveMenu').on('click', function(e) {
         e.preventDefault();
@@ -138,6 +137,33 @@
        }
     });
   }(jQuery));
+
+
+  /* Menu links */
+  $(document).ready(function(){
+    $('body').on('click','.menu-link',function(e){
+      e.preventDefault();
+
+      menu_id = e.target.id.replace("menu_", "")
+
+      $.ajax({
+        type: "POST",
+        url: "{% url 'lists' organization_pk=organization.pk app_pk=app.pk %}",
+          data: {
+              'menu_id': menu_id,
+              'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+          },
+          success: function(data) {
+              // append html to the posts div
+              $('#main-content').html(data['html_from_view']);
+          },
+          error: function(xhr, status, error) {
+              // shit happens friends!
+          }
+      });
+    });
+  });
+
 
 </script>
 {% endblock %}

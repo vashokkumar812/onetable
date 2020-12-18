@@ -23,12 +23,12 @@ urlpatterns = [
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/<int:menu_pk>/edit', views.edit_menu, name='edit_menu'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/<int:menu_pk>/archive', views.archive_menu, name='archive_menu'),
 
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/<int:menu_pk>/lists/', views.lists, name='lists'),
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/<int:menu_pk>/lists/create-list/', views.create_list, name='create_list'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/', views.lists, name='lists'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/create-list/', views.create_list, name='create_list'),
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/notes/', views.notes, name='notes'),
 
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/activity/', views.activity, name='activity'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/dashboard/', views.dashboard, name='dashboard'),
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/tasks/', views.tasks, name='tasks'),
 
