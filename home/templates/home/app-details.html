@@ -90,11 +90,23 @@
         e.preventDefault();
         // Show the input box
         $('#addMenuInput').removeClass('d-none')
+        $('#addMenu').addClass('d-none')
+
     });
   }(jQuery));
 
   (function($) {
-    $('#saveMenu').on('click', function(e) {
+    $('#addMenuClose').on('click', function(e) {
+        e.preventDefault();
+        // Show the input box
+        $('#addMenuInput').addClass('d-none')
+        $('#addMenu').removeClass('d-none')
+
+    });
+  }(jQuery));
+
+  (function($) {
+    $('#addMenuAdd').on('click', function(e) {
         e.preventDefault();
         // Show the input box
 

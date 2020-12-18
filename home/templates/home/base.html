@@ -92,15 +92,15 @@
                             <div class="sidenav-menu-heading">Activity</div>
                             <!-- Sidenav Accordion (Dashboard)-->
                             <a class="nav-link" id="dashboard">
-                                <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                                <div class="nav-link-icon"></i></div>
                                 Dashboard
                             </a>
                             <a class="nav-link" id="tasks">
-                                <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                                <div class="nav-link-icon"></i></div>
                                 Tasks
                             </a>
                             <a class="nav-link" id="notes">
-                                <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                                <div class="nav-link-icon"></i></div>
                                 Notes
                             </a>
                             <div class="sidenav-menu-heading">Lists</div>
@@ -109,17 +109,14 @@
                             </div>
                             <!-- Input menu -->
                             <div class="d-none" id="addMenuInput">
-                              <form class="form-inline mr-auto d-none d-md-block">
-                                  <div class="input-group input-group-joined input-group-solid">
-                                      <input class="form-control mr-sm-2" type="search" id="menuName" name="menuName" placeholder="Menu name" aria-label="Menu name" />
-                                      <div class="input-group-append">
-                                          <div class="input-group-text"><i data-feather="plus" id="saveMenu"></i></div>
-                                      </div>
-                                  </div>
-                              </form>
+                              <div class="form-group">
+                                <input class="form-control form-control-solid" id="menuName" name="menuName" type="email" placeholder="Menu name">
+                                <button class="btn btn-link my-1" id="addMenuClose" type="button">Cancel</button>
+                                <button class="btn btn-link my-1" id="addMenuAdd" type="button">Add</button>
+                              </div>
                             </div>
                             <a class="nav-link" id="addMenu">
-                                <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                                <div class="nav-link-icon"><i data-feather="plus"></i></div>
                                 Add Menu
                             </a>
                         </div>
