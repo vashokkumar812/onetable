@@ -25,6 +25,7 @@ urlpatterns = [
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/', views.lists, name='lists'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/create-list/', views.create_list, name='create_list'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/save-list/', views.save_list, name='save_list'),
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/notes/', views.notes, name='notes'),
 

@@ -25,6 +25,9 @@
                       Create a List
                   </h1>
               </div>
+              <div class="col-12 col-xl-auto mb-3">
+                <a class="btn btn-primary p-2" id="saveList" href="#!">Save List</a>
+              </div>
           </div>
       </div>
   </div>
@@ -57,7 +60,7 @@
             <div class="form-group">
                 <label for="field-type">Field type</label>
                 <select class="form-control" id="field-type" placeholder="Select option">
-                    <option value=""></option>
+                    <option value="" selected disabled hidden>Select one</option>
                     <option value="text">Text</option>
                     <option value="long-text">Long Text</option>
                     <option value="number">Number</option>
@@ -91,6 +94,31 @@
 
 {% block extrajs %}
 
+<script>
+  // Notes page
+  (function($) {
+    $('#saveList').on('click', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+          type: "POST",
+          dataType: 'json',
+          url: "{% url 'save_list' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'fields': JSON.stringify(localStorage.getItem('fields')),
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+</script>
 <script src="{% static 'js/list-create.js' %}"></script>
 
 {% endblock %}

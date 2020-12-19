@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+import json
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu
 from .forms import OrganizationForm, AppForm
@@ -327,7 +328,7 @@ def tasks(request, organization_pk, app_pk):
     else:
 
         context = {
-            
+
         }
 
         return render(request, 'home/tasks.html', context=context)
@@ -380,3 +381,22 @@ def create_list(request, organization_pk, app_pk):
     }
 
     return render(request, 'home/list-create.html', context=context)
+
+
+def save_list(request, organization_pk, app_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+
+    if request.is_ajax and request.method == "POST":
+
+        fieldList = json.loads(request.POST['fields'])
+        for field in fieldList:
+            print(field['fieldLabel'])
+            #print(field['fieldType'])
+            #print(fieldList['required'])
+            #print(fieldList['visible'])
+
+        data_dict = {"message": "Success"}
+
+        return JsonResponse(data=data_dict, safe=False)

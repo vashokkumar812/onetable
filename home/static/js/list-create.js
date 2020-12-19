@@ -13,11 +13,15 @@ function addFieldElement(field) {
   fieldType = field['fieldType'];
   required = field['required'];
   visible = field['visible'];
-  displayType = displayField(fieldType);
-  displayRequired = displayBoolean(required)
-  displayVisible = displayBoolean(visible)
 
-  let fieldItem = formatFieldDisplayItem(fieldId, fieldLabel, displayType, displayRequired, displayVisible)
+  let fieldItem = ''
+  if (field['editMode']) {
+    fieldItem = formatFieldEditItem(fieldId, fieldLabel, fieldType, required, visible)
+
+  } else {
+   fieldItem = formatFieldDisplayItem(fieldId, fieldLabel, fieldType, required, visible)
+  }
+
   const newElement = document.createElement('div');
   newElement.setAttribute('id', "field_" + fieldId);
   newElement.innerHTML = fieldItem;
@@ -28,14 +32,18 @@ function addFieldElement(field) {
 function formatFieldDisplayItem(
   fieldId,
   fieldLabel,
-  displayType,
-  displayRequired,
-  displayVisible
+  fieldType,
+  required,
+  visible,
 ) {
+
+  displayType = displayField(fieldType);
+  displayRequired = displayBoolean(required)
+  displayVisible = displayBoolean(visible)
 
   // Adding new html element
   let fieldDisplayItem = '' +
-  '<div class="card">' +
+  '<div class="card display-field">' +
     '<div class="card-header">' +
       '<div class="col-12 col-xl-auto mb-3">' +
         fieldLabel +
@@ -60,10 +68,90 @@ function formatFieldDisplayItem(
       '<div class="col-6 col-xl-auto mb-3">' +
         '<a class="btn btn-link move-down" href="" id="down_' + fieldId + '">Down</a>' +
       '</div>' +
+      '<div class="col-6 col-xl-auto mb-3">' +
+        '<a class="btn btn-link edit-field" href="" id="edit_' + fieldId + '">Edit</a>' +
+      '</div>' +
     '</div>' +
   '</div>'
 
   return fieldDisplayItem
+
+}
+
+function formatFieldEditItem(
+  fieldId,
+  fieldLabel,
+  fieldType,
+  required,
+  visible,
+) {
+
+  displayType = displayField(fieldType);
+  displayRequired = displayBoolean(required)
+  displayVisible = displayBoolean(visible)
+
+  // Building the new HTML element
+  let fieldEditItem = '' +
+  '<div class="card edit-field">' +
+    '<div class="card-body">' +
+      '<form>' +
+        '<div class="row">' +
+          '<div class="col-lg-8">' +
+            '<div class="form-group">' +
+              '<label for="field-label-' + fieldId + '">Field Label</label>' +
+              '<input class="form-control" id="field-label-' + fieldId + '" value="' + fieldLabel + '" type="text" placeholder="Field label">' +
+            '</div>' +
+          '</div>' +
+          '<div class="col-lg-4">' +
+            '<div class="form-group">' +
+                '<label for="field-type-' + fieldId + '">Field type</label>' +
+                '<select class="form-control" id="field-type-' + fieldId + '" placeholder="Select option">' +
+                    '<option value="" disabled hidden>Choose here</option>' +
+                    '<option value="text">Text</option>' +
+                    '<option value="long-text">Long Text</option>' +
+                    '<option value="number">Number</option>' +
+                    '<option value="decimal">Decimal</option>' +
+                    '<option value="select-one-option">Select One Option</option>' +
+                    '<option value="select-multiple-option">Select Multiple Options</option>' +
+                    '<option value="select-one-list">Select One List</option>' +
+                    '<option value="select-multiple-lists">Select Multiple Lists</option>' +
+                '</select>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="row">' +
+          '<div class="col-lg-12">' +
+            '<div class="custom-control custom-checkbox custom-control-solid">' +
+              '<input class="custom-control-input" id="required-' + fieldId + '" type="checkbox" name="required-' + fieldId + '">' +
+              '<label class="custom-control-label" for="required-' + fieldId + '">Required</label>' +
+            '</div>' +
+            '<div class="custom-control custom-checkbox custom-control-solid">' +
+              '<input class="custom-control-input" id="visible-' + fieldId + '" type="checkbox" name="visible-' + fieldId + '">' +
+              '<label class="custom-control-label" for="visible-' + fieldId + '">Visible</label>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</form>' +
+    '</div>' +
+  '</div>'
+
+  // Go through and replace the html with the correct values
+  if (displayType=="text") {
+    fieldEditItem.replace('<option value="text">Text</option>', '<option value="text" selected>Text</option>')
+  }
+  if (displayType=="long-text") {
+    fieldEditItem.replace('<option value="long-text">Long Text</option>', '<option value="long-text" selected>Long Text</option>')
+  }
+
+  /*
+    if (required) {
+      fieldEditItem.replace('id="required-' + fieldId + '" type="checkbox"', 'id="required-' + fieldId + '" type="checkbox" checked ')
+    }
+    if (visible) {
+      fieldEditItem.replace('id="visible-' + fieldId + '" type="checkbox"', 'id="visible-' + fieldId + '" type="checkbox" checked ')
+    } */
+
+  return fieldEditItem
 
 }
 
@@ -133,6 +221,21 @@ function moveElementDown(elementId) {
     console.log(JSON.parse(localStorage.getItem('fields')))
     refreshFieldDisplay()
   }
+
+}
+
+function setFieldEditMode(elementId) {
+
+  // Get current fields and field length
+  let fields = JSON.parse(localStorage.getItem('fields'))
+
+  // Find element in field list
+  let fieldToEdit = getById(fields, elementId);
+  fieldToEdit['editMode'] = true;
+
+  localStorage.setItem('fields', JSON.stringify(fields))
+  console.log(JSON.parse(localStorage.getItem('fields')))
+  refreshFieldDisplay()
 
 }
 
@@ -232,7 +335,6 @@ function orderFields(fields) {
 
 }
 
-
 $(document).on('click','#add-field', function(e){
 
   e.preventDefault();
@@ -254,6 +356,7 @@ $(document).on('click','#add-field', function(e){
     field['required'] = required;
     field['visible'] = visible;
     field['order'] = null;
+    field['editMode'] = false;
 
     // Add field to the local storage
     let fields = JSON.parse(localStorage.getItem('fields'))
@@ -297,5 +400,14 @@ $(document).on('click','.move-down', function(e){
 
   fieldId = $(this).attr('id').replace("down_","")
   moveElementDown(fieldId)
+
+});
+
+$(document).on('click','.edit-field', function(e){
+
+  e.preventDefault();
+
+  fieldId = $(this).attr('id').replace("edit_","")
+  setFieldEditMode(fieldId)
 
 });
