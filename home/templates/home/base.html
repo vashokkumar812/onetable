@@ -60,13 +60,17 @@
                 </li>
                 {% endif %}
                 <!-- User Dropdown-->
-                <li class="nav-item dropdown no-caret mr-3 mr-lg-0 dropdown-user">
-                    <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" href="javascript:void(0);" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img class="img-fluid" src="{% static 'assets/img/illustrations/profiles/profile-1.png' %}" /></a>
+                {% if user.is_authenticated %}
+
+                <li class="nav-item no-caret d-none d-sm-block mr-3">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdownUserImage" href="javascript:void(0);" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <div class="font-weight-500">My Account</div>
+                    </a>
                     <div class="dropdown-menu dropdown-menu-right border-0 shadow animated--fade-in-up" aria-labelledby="navbarDropdownUserImage">
                         <h6 class="dropdown-header d-flex align-items-center">
                             <div class="dropdown-user-details">
-                                <div class="dropdown-user-details-name">Valerie Luna</div>
-                                <div class="dropdown-user-details-email">vluna@aol.com</div>
+                                <div class="dropdown-user-details-name">{{ user.username }}</div>
+                                <div class="dropdown-user-details-email">{{ user.email }}</div>
                             </div>
                         </h6>
                         <div class="dropdown-divider"></div>
@@ -74,12 +78,17 @@
                             <div class="dropdown-item-icon"><i data-feather="settings"></i></div>
                             Account
                         </a>
-                        <a class="dropdown-item" href="#!">
+                        <a class="dropdown-item" href="{% url 'logout' %}">
                             <div class="dropdown-item-icon"><i data-feather="log-out"></i></div>
                             Logout
                         </a>
                     </div>
                 </li>
+                {% else %}
+                <a class="btn btn-primary p-2" href="{% url 'login' %}">Log In</a>
+                {% endif %}
+
+
             </ul>
         </nav>
         {% if app.pk %}
@@ -91,34 +100,40 @@
                             <!-- Sidenav Menu Heading (Core)-->
                             <div class="sidenav-menu-heading">Activity</div>
                             <!-- Sidenav Accordion (Dashboard)-->
-                            <a class="nav-link" id="dashboard">
+                            <a class="nav-link" id="dashboard" href="javascript:void(0);">
                                 <div class="nav-link-icon"></i></div>
                                 Dashboard
                             </a>
-                            <a class="nav-link" id="tasks">
+                            <a class="nav-link" id="tasks" href="javascript:void(0);">
                                 <div class="nav-link-icon"></i></div>
                                 Tasks
                             </a>
-                            <a class="nav-link" id="notes">
+                            <a class="nav-link" id="notes" href="javascript:void(0);">
                                 <div class="nav-link-icon"></i></div>
                                 Notes
                             </a>
-                            <div class="sidenav-menu-heading">Lists</div>
+                            <a class="nav-link" id="lists" href="javascript:void(0);">
+                                <div class="nav-link-icon"></i></div>
+                                Lists
+                            </a>
+                            <!--
+                            <div class="sidenav-menu-heading">
+                              Folders
+                            </div>
                             <div id="menu-lists">
                               {% include 'home/menu-list.html' %}
                             </div>
-                            <!-- Input menu -->
                             <div class="d-none" id="addMenuInput">
                               <div class="form-group">
                                 <input class="form-control form-control-solid" id="menuName" name="menuName" type="email" placeholder="Menu name">
-                                <button class="btn btn-link my-1" id="addMenuClose" type="button">Cancel</button>
+                                <button class="btn btn-link my-1" id="addMenuClose" type="button">Close</button>
                                 <button class="btn btn-link my-1" id="addMenuAdd" type="button">Add</button>
                               </div>
                             </div>
-                            <a class="nav-link" id="addMenu">
-                                <div class="nav-link-icon"><i data-feather="plus"></i></div>
-                                Add Menu
-                            </a>
+                            <a class="ml-4 mt-2" href="javascript:void(0);" id="addMenu">
+                                <div class="nav-link-icon"></i></div>
+                                Add folder
+                            </a> -->
                         </div>
                     </div>
                     <!-- Sidenav Footer-->

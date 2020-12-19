@@ -282,7 +282,94 @@ def archive_menu(request, organization_pk, app_pk, menu_pk):
         return JsonResponse(data=data_dict, safe=False)
 
 
-def create_list(request, organization_pk, app_pk, menu_id):
+
+#===============================================================================
+# App
+#===============================================================================
+
+@login_required
+def dashboard(request, organization_pk, app_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+
+    html = render_to_string(
+        template_name="home/dashboard.html",
+        context={
+            'organization': organization,
+            'app': app
+        }
+    )
+
+    data_dict = {"html_from_view": html}
+
+    return JsonResponse(data=data_dict, safe=False)
+
+@login_required
+def tasks(request, organization_pk, app_pk):
+
+    if request.is_ajax():
+        organization = get_object_or_404(Organization, pk=organization_pk)
+        app = get_object_or_404(App, pk=app_pk)
+
+        html = render_to_string(
+            template_name="home/tasks.html",
+            context={
+                'organization': organization,
+                'app': app
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
+            
+        }
+
+        return render(request, 'home/tasks.html', context=context)
+
+@login_required
+def notes(request, organization_pk, app_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+
+    html = render_to_string(
+        template_name="home/notes.html",
+        context={
+            'organization': organization,
+            'app': app
+        }
+    )
+
+    data_dict = {"html_from_view": html}
+
+    return JsonResponse(data=data_dict, safe=False)
+
+@login_required
+def lists(request, organization_pk, app_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+
+    html = render_to_string(
+        template_name="home/lists.html",
+        context={
+            'organization': organization,
+            'app': app
+        }
+    )
+
+    data_dict = {"html_from_view": html}
+
+    return JsonResponse(data=data_dict, safe=False)
+
+
+def create_list(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
@@ -292,64 +379,4 @@ def create_list(request, organization_pk, app_pk, menu_id):
         'app': app
     }
 
-    return render(request, 'home/create_list.html', context=context)
-
-
-#===============================================================================
-# App
-#===============================================================================
-
-@login_required
-def dashboard(request, organization_pk, app_pk):
-
-    html = loader.render_to_string(
-        'home/dashboard.html'
-    )
-    # package output data and return it as a JSON object
-    output_data = {
-        'html': html
-    }
-    return JsonResponse(output_data)
-
-@login_required
-def tasks(request, organization_pk, app_pk):
-
-    html = loader.render_to_string(
-        'home/tasks.html'
-    )
-    # package output data and return it as a JSON object
-    output_data = {
-        'html': html
-    }
-    return JsonResponse(output_data)
-
-@login_required
-def notes(request, organization_pk, app_pk):
-
-    html = loader.render_to_string(
-        'home/notes.html'
-    )
-    # package output data and return it as a JSON object
-    output_data = {
-        'html': html
-    }
-    return JsonResponse(output_data)
-
-@login_required
-def lists(request, organization_pk, app_pk):
-
-    menu_id = request.POST.get('menu_id', 'empty')
-    menu = get_object_or_404(Menu, pk=menu_id)
-
-    print(menu_id)
-
-    html = render_to_string(
-        template_name="home/lists.html",
-        context={
-            'menu': menu
-        }
-    )
-
-    data_dict = {"html_from_view": html}
-
-    return JsonResponse(data=data_dict, safe=False)
+    return render(request, 'home/list-create.html', context=context)

@@ -34,7 +34,7 @@
             },
             success: function(data) {
                 // append html to the posts div
-                $('#main-content').html(data.html);
+                $('#main-content').html(data['html_from_view']);
             },
             error: function(xhr, status, error) {
                 // shit happens friends!
@@ -55,7 +55,7 @@
             },
             success: function(data) {
                 // append html to the posts div
-                $('#main-content').html(data.html);
+                $('#main-content').html(data['html_from_view']);
             },
             error: function(xhr, status, error) {
                 // shit happens friends!
@@ -76,7 +76,7 @@
             },
             success: function(data) {
                 // append html to the posts div
-                $('#main-content').html(data.html);
+                $('#main-content').html(data['html_from_view']);
             },
             error: function(xhr, status, error) {
                 // shit happens friends!
@@ -85,6 +85,28 @@
     });
   }(jQuery));
 
+  // Notes page
+  (function($) {
+    $('#lists').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: "{% url 'lists' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data['html_from_view']);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+  /*
   (function($) {
     $('#addMenu').on('click', function(e) {
         e.preventDefault();
@@ -152,6 +174,7 @@
 
 
   /* Menu links */
+  /*
   $(document).ready(function(){
     $('body').on('click','.menu-link',function(e){
       e.preventDefault();
@@ -174,7 +197,7 @@
           }
       });
     });
-  });
+  }); */
 
 
 </script>
