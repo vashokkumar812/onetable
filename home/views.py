@@ -393,9 +393,7 @@ def save_list(request, organization_pk, app_pk):
         fieldList = json.loads(request.POST['fields'])
         for field in fieldList:
             print(field['fieldLabel'])
-            #print(field['fieldType'])
-            #print(fieldList['required'])
-            #print(fieldList['visible'])
+            # Other fields here
 
         data_dict = {"message": "Success"}
 

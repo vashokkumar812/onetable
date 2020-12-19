@@ -100,12 +100,18 @@
     $('#saveList').on('click', function(e) {
         e.preventDefault();
 
+        let fields = JSON.parse(localStorage.getItem('fields'))
+        for (let i = 0; i < fields.length; i++) {
+           field = fields[i]
+           console.log(field)
+        }
+
         $.ajax({
           type: "POST",
           dataType: 'json',
           url: "{% url 'save_list' organization_pk=organization.pk app_pk=app.pk %}",
             data: {
-                'fields': JSON.stringify(localStorage.getItem('fields')),
+                'fields': JSON.stringify(fields),
                 'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
             },
             success: function(data) {
