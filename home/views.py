@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 import json
 
-from .models import Organization, OrganizationUser, App, AppUser, Menu
+from .models import Organization, OrganizationUser, App, AppUser, Menu, List
 from .forms import OrganizationForm, AppForm
 
 #===============================================================================
@@ -357,11 +357,14 @@ def lists(request, organization_pk, app_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
 
+    lists = List.objects.all().filter(status='active', app=app);
+
     html = render_to_string(
         template_name="home/lists.html",
         context={
             'organization': organization,
-            'app': app
+            'app': app,
+            'lists': lists
         }
     )
 
@@ -390,10 +393,26 @@ def save_list(request, organization_pk, app_pk):
 
     if request.is_ajax and request.method == "POST":
 
-        fieldList = json.loads(request.POST['fields'])
-        for field in fieldList:
-            print(field['fieldLabel'])
-            # Other fields here
+        list_name = request.POST.get('list_name', None)
+
+        field_list = json.loads(request.POST['fields'])
+        for field in field_list:
+
+            fieldLabel = field['fieldLabel']
+            fieldType = field['fieldType']
+            required = field['required']
+            visible = field['visible']
+            primary = field['primary']
+            order = field['order']
+
+        list = List.objects.create(
+            name=list_name,
+            app=app,
+            status='active',
+            created_at=timezone.now(),
+            created_user=request.user,
+            fields=field_list)
+        list.save();
 
         data_dict = {"message": "Success"}
 

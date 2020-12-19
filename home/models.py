@@ -5,6 +5,7 @@ import uuid
 from django.contrib.auth.models import User
 from datetime import date
 from django.utils import timezone
+from django.contrib.postgres.fields import JSONField
 
 class Organization(models.Model):
     name = models.CharField(max_length=200)
@@ -140,13 +141,14 @@ class List(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
+    fields = JSONField()
 
     LIST_STATUS = (
         ('active', 'Active'),
         ('archived', 'Archived'),
         ('deleted', 'Deleted'),
     )
-
+    
     status = models.CharField(
         max_length=25,
         choices=LIST_STATUS,
