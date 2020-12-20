@@ -22,6 +22,108 @@
 {% endblock %}
 
 {% block content %}
-  {# Initially load default dashboard #}
 
+  {% if type == 'dashboard' %}
+    {% include 'home/dashboard.html' %}
+  {% elif type == 'tasks' %}
+    {% include 'home/tasks.html' %}
+  {% elif type == 'notes' %}
+    {% include 'home/notes.html' %}
+  {% elif type == 'lists' %}
+    {% include 'home/lists.html' %}
+  {% else %}
+    {# Load default dashboard #}
+    {% include 'home/dashboard.html' %}
+  {% endif %}
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+
+  // Activity page
+  (function($) {
+    $('#dashboard').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "GET",
+            url: "{% url 'dashboard' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data['html_from_view']);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+  // Tasks page
+  (function($) {
+    $('#tasks').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: "GET",
+          url: "{% url 'tasks' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data['html_from_view']);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+  // Notes page
+  (function($) {
+    $('#notes').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: "GET",
+          url: "{% url 'notes' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data['html_from_view']);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+  // Lists page
+  (function($) {
+    $('#lists').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: "GET",
+          url: "{% url 'lists' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+                $('#main-content').html(data['html_from_view']);
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+</script>
 {% endblock %}

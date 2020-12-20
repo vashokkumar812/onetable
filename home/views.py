@@ -11,7 +11,7 @@ from .models import Organization, OrganizationUser, App, AppUser, Menu, List
 from .forms import OrganizationForm, AppForm
 
 #===============================================================================
-# Static Pages
+# Static Pages / Home Page Setup
 #===============================================================================
 
 def home(request):
@@ -29,6 +29,10 @@ def privacy(request):
 def about(request):
     context = {}
     return render(request, 'home/about.html', context=context)
+
+#===============================================================================
+# Organizations
+#===============================================================================
 
 @login_required
 def organizations(request):
@@ -71,6 +75,7 @@ def add_organization(request):
 
         return render(request, 'home/organization-form.html', {'form': form})
 
+@login_required
 def edit_organization(request, organization_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
 
@@ -91,7 +96,7 @@ def edit_organization(request, organization_pk):
 
         return render(request, 'home/organization-form.html', {'form': form})
 
-
+@login_required
 def archive_organization(request, organization_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -101,6 +106,7 @@ def archive_organization(request, organization_pk):
 
     return redirect('organizations')
 
+@login_required
 def organization_settings(request, organization_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -113,6 +119,10 @@ def organization_settings(request, organization_pk):
     }
 
     return render(request, 'home/organization-settings.html', context=context)
+
+#===============================================================================
+# Apps (Workspaces)
+#===============================================================================
 
 @login_required
 def apps(request, organization_pk):
@@ -166,7 +176,7 @@ def add_app(request, organization_pk):
 
         return render(request, 'home/app-form.html', {'form': form})
 
-
+@login_required
 def edit_app(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -190,7 +200,7 @@ def edit_app(request, organization_pk, app_pk):
 
         return render(request, 'home/app-form.html', {'form': form})
 
-
+@login_required
 def archive_app(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -201,6 +211,7 @@ def archive_app(request, organization_pk, app_pk):
 
     return redirect('apps', organization_pk=organization_pk)
 
+@login_required
 def app_settings(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -221,27 +232,17 @@ def app_details(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
-    menus = Menu.objects.all().order_by('order').filter(status='active', app=app);
     context = {
         'organization': organization,
         'app': app,
-        'menus': menus
+        'type': 'dashboard'
     }
 
     return render(request, 'home/workspace.html', context=context)
 
-@login_required
-def app_details(request, organization_pk, app_pk):
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    context = {
-        'organization': organization,
-        'app': app
-    }
-
-    return render(request, 'home/workspace.html', context=context)
-
+#===============================================================================
+# Menus
+#===============================================================================
 
 @login_required
 def add_menu(request, organization_pk, app_pk):
@@ -325,9 +326,8 @@ def archive_menu(request, organization_pk, app_pk, menu_pk):
         return JsonResponse(data=data_dict, safe=False)
 
 
-
 #===============================================================================
-# App
+# Workspace Pages
 #===============================================================================
 
 @login_required
@@ -336,24 +336,37 @@ def dashboard(request, organization_pk, app_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
 
-    html = render_to_string(
-        template_name="home/dashboard.html",
-        context={
+    if request.is_ajax() and request.method == "GET":
+
+        html = render_to_string(
+            template_name="home/dashboard.html",
+            context={
+                'organization': organization,
+                'app': app
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
             'organization': organization,
-            'app': app
+            'app': app,
+            'type': 'dashboard'
         }
-    )
 
-    data_dict = {"html_from_view": html}
-
-    return JsonResponse(data=data_dict, safe=False)
+        return render(request, 'home/workspace.html', context=context)
 
 @login_required
 def tasks(request, organization_pk, app_pk):
 
-    if request.is_ajax():
-        organization = get_object_or_404(Organization, pk=organization_pk)
-        app = get_object_or_404(App, pk=app_pk)
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+
+    if request.is_ajax() and request.method == "GET":
 
         html = render_to_string(
             template_name="home/tasks.html",
@@ -370,10 +383,13 @@ def tasks(request, organization_pk, app_pk):
     else:
 
         context = {
-
+            'organization': organization,
+            'app': app,
+            'type': 'tasks'
         }
 
-        return render(request, 'home/tasks.html', context=context)
+        return render(request, 'home/workspace.html', context=context)
+
 
 @login_required
 def notes(request, organization_pk, app_pk):
@@ -381,38 +397,67 @@ def notes(request, organization_pk, app_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
 
-    html = render_to_string(
-        template_name="home/notes.html",
-        context={
+    if request.is_ajax() and request.method == "GET":
+
+        html = render_to_string(
+            template_name="home/notes.html",
+            context={
+                'organization': organization,
+                'app': app
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
             'organization': organization,
-            'app': app
+            'app': app,
+            'type': 'notes'
         }
-    )
 
-    data_dict = {"html_from_view": html}
+        return render(request, 'home/workspace.html', context=context)
 
-    return JsonResponse(data=data_dict, safe=False)
+
+#===============================================================================
+# Lists
+#===============================================================================
 
 @login_required
 def lists(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
+    lists = List.objects.all().filter(status='active', app=app)
 
-    lists = List.objects.all().filter(status='active', app=app);
+    if request.is_ajax() and request.method == "GET":
 
-    html = render_to_string(
-        template_name="home/lists.html",
-        context={
+        html = render_to_string(
+            template_name="home/lists.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'lists': lists
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
             'organization': organization,
             'app': app,
-            'lists': lists
+            'lists': lists,
+            'type': 'lists'
         }
-    )
 
-    data_dict = {"html_from_view": html}
-
-    return JsonResponse(data=data_dict, safe=False)
+        return render(request, 'home/workspace.html', context=context)
 
 
 def create_list(request, organization_pk, app_pk):
