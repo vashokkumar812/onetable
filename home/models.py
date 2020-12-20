@@ -9,6 +9,7 @@ from django.contrib.postgres.fields import JSONField
 
 class Organization(models.Model):
     name = models.CharField(max_length=200)
+    description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
@@ -60,6 +61,7 @@ class OrganizationUser(models.Model):
 
 class App(models.Model):
     name = models.CharField(max_length=200)
+    description = models.TextField()
     organization = models.ForeignKey('Organization', on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
@@ -148,7 +150,7 @@ class List(models.Model):
         ('archived', 'Archived'),
         ('deleted', 'Deleted'),
     )
-    
+
     status = models.CharField(
         max_length=25,
         choices=LIST_STATUS,

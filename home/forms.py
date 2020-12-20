@@ -6,18 +6,20 @@ class OrganizationForm(forms.ModelForm):
 
     class Meta:
         model = Organization
-        fields = ('name',)
+        fields = ('name','description',)
 
         widgets = {
-            'name': forms.TextInput(attrs={'class':'form-control form-control-solid'})
+            'name': forms.TextInput(attrs={'class':'form-control form-control-solid'}),
+            'description': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }
 
 class AppForm(forms.ModelForm):
 
     class Meta:
         model = App
-        fields = ('name',)
+        fields = ('name','description',)
 
         widgets = {
-            'name': forms.TextInput(attrs={'class':'form-control form-control-solid'})
+            'name': forms.TextInput(attrs={'class':'form-control form-control-solid'}),
+            'description': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }

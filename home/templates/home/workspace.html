@@ -35,6 +35,8 @@ class="bg-white"
     {% include 'home/notes.html' %}
   {% elif type == 'lists' %}
     {% include 'home/lists.html' %}
+  {% elif type == 'list-create' %}
+    {% include 'home/list-create.html' %}
   {% else %}
     {# Load default dashboard #}
     {% include 'home/dashboard.html' %}
@@ -129,5 +131,41 @@ class="bg-white"
     });
   }(jQuery));
 
+  // Notes page
+  (function($) {
+    $('#saveList').on('click', function(e) {
+        e.preventDefault();
+
+        let fields = JSON.parse(localStorage.getItem('fields'))
+        for (let i = 0; i < fields.length; i++) {
+           field = fields[i]
+           console.log(field)
+        }
+
+        let list_name = $('#list_name').val()
+
+        $.ajax({
+          type: "POST",
+          dataType: 'json',
+          url: "{% url 'save_list' organization_pk=organization.pk app_pk=app.pk %}",
+            data: {
+                'list_name': list_name,
+                'fields': JSON.stringify(fields),
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+                // append html to the posts div
+
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
 </script>
+
+<script src="{% static 'js/list-create.js' %}"></script>
+
 {% endblock %}

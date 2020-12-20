@@ -41,38 +41,35 @@ function formatFieldDisplayItem(
   displayRequired = displayBoolean(required)
   displayVisible = displayBoolean(visible)
 
-  // Adding new html element
-  let fieldDisplayItem = '' +
-  '<div class="card display-field">' +
-    '<div class="card-header">' +
-      '<div class="col-12 col-xl-auto mb-3">' +
-        fieldLabel +
+  let fieldDisplayItem = '<div class="card card-icon card card-header-actions lift lift-sm h-100 mb-2">' +
+      '<div class="row no-gutters">' +
+          '<div class="col-auto card-icon-aside bg-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers mr-1 text-white-50"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>' +
+          '<div class="col">' +
+            '<div class="card-header bg-white">' +
+                fieldLabel +
+                '<div>' +
+                  '<button class="btn btn-link move-up" id="up_' + fieldId + '">Move up</button>' +
+                  '<button class="btn btn-link move-down" id="down_' + fieldId + '">Move down</button>' +
+                '</div>' +
+                '<div class="dropdown no-caret">' +
+                    '<button class="btn btn-link" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</button>' +
+                    '<div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="dropdownMenuButton">' +
+                        '<a class="dropdown-item remove-field" id="remove_' + fieldId + '" href="#">' +
+                          '<div class="dropdown-item-icon"><i class="text-gray-500" data-feather="delete"></i></div>' +
+                          'Delete' +
+                        '</a>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+              '<div class="card-body py-2">' +
+                  '<p>Field Type: '+ displayType +'</p>' +
+                  '<p>Required: '+ displayRequired +'</p>' +
+                  '<p>Visible: '+ displayVisible +'</p>' +
+              '</div>' +
+          '</div>' +
       '</div>' +
     '</div>' +
-    '<div class="card-body">' +
-      '<div class="col-12 col-xl-auto mb-3"> ' +
-        'Field Type: ' + displayType +
-      '</div>' +
-      '<div class="col-12 col-xl-auto mb-3"> ' +
-        'Required: ' + displayRequired +
-      '</div>' +
-      '<div class="col-12 col-xl-auto mb-3"> ' +
-        'Visible: ' + displayVisible +
-      '</div>' +
-      '<div class="col-12 col-xl-auto mb-3">' +
-        '<a class="btn btn-primary p-2 remove-field" href="" id="remove_' + fieldId + '">Remove</a>' +
-      '</div>' +
-      '<div class="col-6 col-xl-auto mb-3">' +
-        '<a class="btn btn-link move-up" href="" id="up_' + fieldId + '">Up</a>' +
-      '</div>' +
-      '<div class="col-6 col-xl-auto mb-3">' +
-        '<a class="btn btn-link move-down" href="" id="down_' + fieldId + '">Down</a>' +
-      '</div>' +
-      '<div class="col-6 col-xl-auto mb-3">' +
-        '<a class="btn btn-link edit-field" href="" id="edit_' + fieldId + '">Edit</a>' +
-      '</div>' +
-    '</div>' +
-  '</div>'
+  '</div>';
 
   return fieldDisplayItem
 
@@ -134,22 +131,6 @@ function formatFieldEditItem(
       '</form>' +
     '</div>' +
   '</div>'
-
-  // Go through and replace the html with the correct values
-  if (displayType=="text") {
-    fieldEditItem.replace('<option value="text">Text</option>', '<option value="text" selected>Text</option>')
-  }
-  if (displayType=="long-text") {
-    fieldEditItem.replace('<option value="long-text">Long Text</option>', '<option value="long-text" selected>Long Text</option>')
-  }
-
-  /*
-    if (required) {
-      fieldEditItem.replace('id="required-' + fieldId + '" type="checkbox"', 'id="required-' + fieldId + '" type="checkbox" checked ')
-    }
-    if (visible) {
-      fieldEditItem.replace('id="visible-' + fieldId + '" type="checkbox"', 'id="visible-' + fieldId + '" type="checkbox" checked ')
-    } */
 
   return fieldEditItem
 

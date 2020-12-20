@@ -460,17 +460,36 @@ def lists(request, organization_pk, app_pk):
         return render(request, 'home/workspace.html', context=context)
 
 
+@login_required
 def create_list(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
+    lists = List.objects.all().filter(status='active', app=app)
 
-    context = {
-        'organization': organization,
-        'app': app
-    }
+    if request.is_ajax() and request.method == "GET":
 
-    return render(request, 'home/list-create.html', context=context)
+        html = render_to_string(
+            template_name="home/list-create.html",
+            context={
+                'organization': organization,
+                'app': app
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'type': 'list-create'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
 
 
 def save_list(request, organization_pk, app_pk):

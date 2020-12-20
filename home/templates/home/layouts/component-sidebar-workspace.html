@@ -25,7 +25,7 @@
                 <!-- Sidenav Menu Heading (Core)-->
                 <div class="sidenav-menu-heading">Configuration</div>
                 <!-- Sidenav Accordion (Dashboard)-->
-                <a class="nav-link" id="dashboard" href="javascript:void(0);">
+                <a class="nav-link" id="dashboard" href="{% url 'app_settings' organization_pk=organization.pk app_pk=app.pk %}">
                     <div class="nav-link-icon"></div>
                     Settings
                 </a>
