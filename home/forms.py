@@ -9,7 +9,7 @@ class OrganizationForm(forms.ModelForm):
         fields = ('name',)
 
         widgets = {
-            'name': forms.TextInput(attrs={'class':'form-control'})
+            'name': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }
 
 class AppForm(forms.ModelForm):
@@ -19,5 +19,5 @@ class AppForm(forms.ModelForm):
         fields = ('name',)
 
         widgets = {
-            'name': forms.TextInput(attrs={'class':'form-control'})
+            'name': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }

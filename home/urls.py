@@ -16,6 +16,7 @@ urlpatterns = [
     path('organizations/<int:organization_pk>/apps/', views.apps, name='apps'),
     path('organizations/<int:organization_pk>/apps/add/', views.add_app, name='add_app'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/', views.app_details, name='app_details'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/settings', views.app_settings, name='app_settings'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/edit', views.edit_app, name='edit_app'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/archive', views.archive_app, name='archive_app'),
 

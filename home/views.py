@@ -200,6 +200,30 @@ def app_details(request, organization_pk, app_pk):
 
     return render(request, 'home/workspace.html', context=context)
 
+@login_required
+def app_details(request, organization_pk, app_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    context = {
+        'organization': organization,
+        'app': app
+    }
+
+    return render(request, 'home/workspace.html', context=context)
+
+@login_required
+def app_settings(request, organization_pk, app_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    context = {
+        'organization': organization,
+        'app': app
+    }
+
+    return render(request, 'home/workspace.html', context=context)
+
 
 @login_required
 def add_menu(request, organization_pk, app_pk):

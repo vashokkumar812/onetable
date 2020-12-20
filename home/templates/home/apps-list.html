@@ -2,16 +2,28 @@
 <div class="row">
   {% for app in apps %}
     <div class="col-lg-4 mb-4">
-      <!-- Knowledge base category card 1-->
-      <a class="card lift lift-sm h-100" href="{% url 'app_details' organization_pk=organization.pk app_pk=app.pk %}">
+      <div class="card card-header-actions lift lift-sm h-100">
+          <div class="card-header bg-white">
+              <a href="{% url 'app_details' organization_pk=organization.pk app_pk=app.pk %}">{{ app.name }}</a>
+              <div class="dropdown no-caret">
+                  <button class="btn btn-transparent-dark btn-icon dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="text-gray-500" data-feather="more-vertical"></i></button>
+                  <div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="#!">
+                          <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="list"></i></div>
+                          Settings
+                      </a>
+                      <a class="dropdown-item" href="#!">
+                          <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="minus-circle"></i></div>
+                          Archive
+                      </a>
+                  </div>
+              </div>
+          </div>
           <div class="card-body py-5">
-              <h5 class="card-title text-primary mb-2">
-                  {{ app.name }}
-              </h5>
               <p class="card-text">This is a quick description about this workspace, if one exists</p>
           </div>
-          <div class="card-footer"><div class="small text-muted">3 users in this workspace</div></div>
-      </a>
+          <div class="card-footer bg-white"><div class="small text-muted">3 users in this workspace</div></div>
+      </div>
     </div>
   {% endfor %}
 </div>
