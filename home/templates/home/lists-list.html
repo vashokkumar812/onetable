@@ -2,7 +2,7 @@
 <div class="row">
     {% for list in lists %}
     <div class="col-lg-4 mb-5">
-        <a class="card lift h-100" href="#">
+        <a class="card lift h-100" href="{% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}">
           <div class="card-body">
               <h4 class="card-title mb-2">{{ list.name }}</h4>
           </div>

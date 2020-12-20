@@ -1,14 +1,18 @@
 {% if organizations %}
 <div class="row">
-    {% for organization in organizations %}
-    <div class="col-lg-4 mb-5">
-        <a class="card lift h-100" href="{% url 'apps' organization_pk=organization.pk %}">
-          <div class="card-body">
-              <h4 class="card-title mb-2">{{ organization.name }}</h4>
+  {% for organization in organizations %}
+    <div class="col-lg-4 mb-4">
+      <!-- Knowledge base category card 1-->
+      <a class="card lift lift-sm h-100" href="{% url 'apps' organization_pk=organization.pk %}">
+          <div class="card-body py-5">
+              <h5 class="card-title text-primary mb-2">
+                  {{ organization.name }}
+              </h5>
+              <p class="card-text">This is a quick description about this organization, if one exists</p>
           </div>
-        </a>
+          <div class="card-footer"><div class="small text-muted">3 users in this organization</div></div>
+      </a>
     </div>
-    {% endfor %}
-  </div>
-  <hr class="mt-5" />
+  {% endfor %}
+</div>
 {% endif %}

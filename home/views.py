@@ -198,7 +198,7 @@ def app_details(request, organization_pk, app_pk):
         'menus': menus
     }
 
-    return render(request, 'home/app-details.html', context=context)
+    return render(request, 'home/workspace.html', context=context)
 
 
 @login_required
@@ -396,6 +396,7 @@ def save_list(request, organization_pk, app_pk):
         list_name = request.POST.get('list_name', None)
 
         field_list = json.loads(request.POST['fields'])
+
         for field in field_list:
 
             fieldLabel = field['fieldLabel']
@@ -414,6 +415,21 @@ def save_list(request, organization_pk, app_pk):
             fields=field_list)
         list.save();
 
+        # TODO Return page redirect
         data_dict = {"message": "Success"}
 
         return JsonResponse(data=data_dict, safe=False)
+
+def list(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    context = {
+        'organization': organization,
+        'app': app,
+        'list': list
+    }
+
+    return render(request, 'home/list.html', context=context)

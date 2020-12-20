@@ -1,21 +1,27 @@
-{% extends "home/base.html" %}
+{% extends "home/layouts/layout-fixed-side-bar.html" %}
 {% load static %}
 
 {% block title %}
-    OneTable - Dashboard
+    OneTable - {{ app.name }}
 {% endblock %}
 
-{% block topbar %}
-  {% include "home/header-dashboard.html" %}
+{% block headername %}
+  {{ app.name }}
+{% endblock %}
+
+{% block headerlink %}
+  {% url 'apps' organization_pk=organization.pk %}
+{% endblock %}
+
+{% block header %}
+  {% include 'home/layouts/component-header-workspace.html' %}
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'home/layouts/component-sidebar-workspace.html' %}
 {% endblock %}
 
 {% block content %}
+  {# Initially load default dashboard #}
 
-{# Initially load default page-1 #}
-<div id="page-content">{% include 'home/activity.html' %}</div>
-
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
