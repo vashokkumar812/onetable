@@ -178,19 +178,22 @@ def edit_app(request, organization_pk, app_pk):
             app = form.save(commit=False)
             app.last_updated = timezone.now()
             app.save()
-            return redirect('app_details', organization_pk=organization_pk, app_pk=app_pk)
+            return redirect('apps', organization_pk=organization_pk)
     else:
         form = AppForm(instance=app)
+
         context = {
-            'form': form,
             'organization': organization,
-            'app': app
+            'app': app,
+            'form': form
         }
+
         return render(request, 'home/app-form.html', {'form': form})
 
 
 def archive_app(request, organization_pk, app_pk):
 
+    organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
 
     app.status = "archived"
@@ -198,6 +201,20 @@ def archive_app(request, organization_pk, app_pk):
 
     return redirect('apps', organization_pk=organization_pk)
 
+def app_settings(request, organization_pk, app_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+
+    form = AppForm(instance=app)
+
+    context = {
+        'organization': organization,
+        'app': app,
+        'form': form
+    }
+
+    return render(request, 'home/app-settings.html', context=context)
 
 @login_required
 def app_details(request, organization_pk, app_pk):
@@ -215,18 +232,6 @@ def app_details(request, organization_pk, app_pk):
 
 @login_required
 def app_details(request, organization_pk, app_pk):
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    context = {
-        'organization': organization,
-        'app': app
-    }
-
-    return render(request, 'home/workspace.html', context=context)
-
-@login_required
-def app_settings(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)

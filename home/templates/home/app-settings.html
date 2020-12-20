@@ -2,15 +2,15 @@
 {% load static %}
 
 {% block title %}
-    OneTable - Organization Settings
+    OneTable - Workspace Settings
 {% endblock %}
 
 {% block headername %}
-  OneTable
+  {{ app.name }}
 {% endblock %}
 
 {% block headerlink %}
-  {% url 'home' %}
+  {% url 'app_details' organization_pk=organization.pk app_pk=app.pk %}
 {% endblock %}
 
 {% block header %}
@@ -32,7 +32,7 @@
                 <div class="col-auto mb-3">
                     <h1 class="page-header-title">
                         <div class="page-header-icon"><i data-feather="settings"></i></div>
-                        Settings for {{ organization.name }}
+                        Settings for {{ app.name }} in {{ organization.name }}
                     </h1>
                 </div>
             </div>
@@ -49,10 +49,10 @@
                   Details
               </div>
               <div class="card-body">
-                <form method="POST" action="{% url 'edit_organization' organization_pk=organization.pk %}">{% csrf_token %}
+                <form method="POST" action="{% url 'edit_app' organization_pk=organization.pk app_pk=app.pk %}">{% csrf_token %}
                   {{ form.as_p }}
                   <button type="submit" class="btn btn-lg btn-primary font-weight-500 mr-3">
-                    Update Organization
+                    Update Workspace
                   </button>
                 </form>
               </div>
@@ -61,13 +61,13 @@
       <div class="col-lg-4">
           <!-- Notifications preferences card-->
           <div class="card">
-              <div class="card-header">Archive Organization</div>
+              <div class="card-header">Archive Workspace</div>
               <div class="card-body">
-                  <p>You can archive this organization if you will no longer use it. Data will still be available under the archived filter.
-                  <form method="POST" action="{% url 'archive_organization' organization_pk=organization.pk %}">
+                  <p>You can archive this workspace if you will no longer use it. Data will still be available under the archived filter.
+                  <form method="POST" action="{% url 'archive_app' organization_pk=organization.pk app_pk=app.pk %}">
                     {% csrf_token %}
                     <button type="submit" name="project_id" class="btn btn-danger-soft text-danger">
-                      Archive this organization
+                      Archive this workspace
                     </button>
                   </form>
               </div>
