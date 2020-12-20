@@ -101,6 +101,19 @@ def archive_organization(request, organization_pk):
 
     return redirect('organizations')
 
+def organization_settings(request, organization_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+
+    form = OrganizationForm(instance=organization)
+
+    context = {
+        'organization': organization,
+        'form': form
+    }
+
+    return render(request, 'home/organization-settings.html', context=context)
+
 @login_required
 def apps(request, organization_pk):
 

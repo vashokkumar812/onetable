@@ -10,6 +10,7 @@ urlpatterns = [
 
     path('organizations/', views.organizations, name='organizations'),
     path('organizations/add/', views.add_organization, name='add_organization'),
+    path('organizations/<int:organization_pk>/settings', views.organization_settings, name='organization_settings'),
     path('organizations/<int:organization_pk>/edit', views.edit_organization, name='edit_organization'),
     path('organizations/<int:organization_pk>/archive', views.archive_organization, name='archive_organization'),
 
