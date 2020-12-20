@@ -491,7 +491,7 @@ def create_list(request, organization_pk, app_pk):
 
         return render(request, 'home/workspace.html', context=context)
 
-
+@login_required
 def save_list(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -526,6 +526,7 @@ def save_list(request, organization_pk, app_pk):
 
         return JsonResponse(data=data_dict, safe=False)
 
+@login_required
 def list(request, organization_pk, app_pk, list_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -539,3 +540,30 @@ def list(request, organization_pk, app_pk, list_pk):
     }
 
     return render(request, 'home/list.html', context=context)
+
+@login_required
+def archive_list(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    list.status = "archived"
+    list.save()
+
+    return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
+
+@login_required
+def list_settings(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    context = {
+        'organization': organization,
+        'app': app,
+        'list': list
+    }
+
+    return render(request, 'home/list-settings.html', context=context)

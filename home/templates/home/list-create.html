@@ -1,29 +1,31 @@
 {% load static %}
-<header class="page-header page-header-light bg-white pb-10">
+<header class="page-header page-header-light page-header-light border-bottom bg-white mb-4">
   <div class="container">
       <div class="page-header-content pt-4">
-          <div class="row align-items-center justify-content-between">
+          <div class="row align-items-center justify-content-between mb-3">
               <div class="col-auto mt-4">
-                  <h1 class="page-header-title">
-                    Create a list
-                  </h1>
-                  <a href="{% url 'organizations' %}"><div class="page-header-subtitle"><i data-feather="arrow-left" class="page-header-subtitle"></i> Back to list</div></a>
+                <h1 class="page-header-title">
+                  Create a list
+                </h1>
+              </div>
+              <div class="col-12 col-xl-auto mb-3">
+                <a class="" href="#">
+                  <div class="page-header-subtitle"><a href="" id="save_list">Save List</a></div>
+                </a>
               </div>
           </div>
-          <div class="row align-items-center justify-content-between">
-            <div class="form-group">
-              <label for="listName">Enter a name for this list</label>
-              <input class="form-control" id="list_name" type="text" placeholder="List name" />
-            </div>
-            <div class="col-12 col-xl-auto mb-3">
-              <a class="btn btn-primary p-2" id="saveList" href="#!">Save List</a>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="form-group">
+                <input class="form-control form-control-solid" id="list_name" type="text" placeholder="Name your list here" />
+              </div>
             </div>
           </div>
       </div>
   </div>
 </header>
 <!-- Main page content-->
-<div class="container mt-n10">
+<div class="container">
 
   <div id="list">
 
