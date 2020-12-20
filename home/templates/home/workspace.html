@@ -37,6 +37,10 @@ class="bg-white"
     {% include 'home/lists.html' %}
   {% elif type == 'list-create' %}
     {% include 'home/list-create.html' %}
+  {% elif type == 'list' %}
+    {% include 'home/list.html' %}
+  {% elif type == 'add-record' %}
+    {% include 'home/add-record.html' %}
   {% else %}
     {# Load default dashboard #}
     {% include 'home/dashboard.html' %}

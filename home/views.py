@@ -459,6 +459,38 @@ def lists(request, organization_pk, app_pk):
 
         return render(request, 'home/workspace.html', context=context)
 
+@login_required
+def list(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    if request.is_ajax() and request.method == "GET":
+
+        html = render_to_string(
+            template_name="home/list.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'list': list
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list': list,
+            'type': 'list'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
 
 @login_required
 def create_list(request, organization_pk, app_pk):
@@ -527,21 +559,6 @@ def save_list(request, organization_pk, app_pk):
         return JsonResponse(data=data_dict, safe=False)
 
 @login_required
-def list(request, organization_pk, app_pk, list_pk):
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    context = {
-        'organization': organization,
-        'app': app,
-        'list': list
-    }
-
-    return render(request, 'home/list.html', context=context)
-
-@login_required
 def archive_list(request, organization_pk, app_pk, list_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -567,3 +584,36 @@ def list_settings(request, organization_pk, app_pk, list_pk):
     }
 
     return render(request, 'home/list-settings.html', context=context)
+
+@login_required
+def add_record(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    if request.is_ajax() and request.method == "GET":
+
+        html = render_to_string(
+            template_name="home/add-record.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'list': list
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list': list,
+            'type': 'add-record'
+        }
+
+        return render(request, 'home/workspace.html', context=context)

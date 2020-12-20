@@ -6,12 +6,9 @@
                   <h1 class="page-header-title">
                     Records for {{ list.name }}
                   </h1>
-                  <a href="{% url 'organizations' %}"><div class="page-header-subtitle"><i data-feather="arrow-left" class="page-header-subtitle"></i> Back to list</div></a>
               </div>
               <div class="col-12 col-xl-auto mb-3">
-                <a class="" href="#">
-                  <div class="page-header-subtitle"><a href="">Add new record</a></div>
-                </a>
+                <div class="page-header-subtitle"><a href="#">Add new record</a></div>
               </div>
           </div>
       </div>
@@ -19,10 +16,8 @@
 </header>
 <!-- Main page content-->
 <div class="container bg-white mt-n10">
+<!-- Main page content-->
   <div id="records-list">
-    {% include "home/records-list.html" %}
+    {% include "home/lists-list.html" %}
   </div>
 </div>
-
-
-{% endblock %}
