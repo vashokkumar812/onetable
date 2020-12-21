@@ -32,6 +32,7 @@ urlpatterns = [
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/settings', views.list_settings, name='list_settings'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/archive', views.archive_list, name='archive_list'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/add-record', views.add_record, name='add_record'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/save-record', views.save_record, name='save_record'),
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/notes/', views.notes, name='notes'),
 

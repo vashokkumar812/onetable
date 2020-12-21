@@ -19,13 +19,23 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="sbp-preview-content">
-        <form>
+        <form method="POST" action="{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}">{% csrf_token %}
             {% for field in list.fields%}
-            <div class="form-group">
-                <label for="exampleFormControlInput1">{{ field.fieldLabel }}</label>
-                <input class="form-control form-control-solid" id="field_{{ field.fieldId }}" type="text" placeholder="Input response here">
-            </div>
+              {% if field.fieldType == 'text' %}
+                <div class="form-group">
+                  <label for="field_{{ field.id }}">{{ field.fieldLabel }}</label>
+                  <input class="form-control form-control-solid" id="field_{{ field.id }}" type="text" placeholder="Input response here">
+                </div>
+              {% elif field.fieldType == 'long-text' %}
+                <div class="form-group">
+                  <label for="field_{{ field.id }}">{{ field.fieldLabel }}</label>
+                  <textarea class="form-control form-control-solid" id="field_{{ field.id }}" rows="3"></textarea>
+                </div>
+              {% endif %}
             {% endfor %}
+            <button type="submit" class="btn btn-lg btn-primary font-weight-500 mr-3">
+              Save record
+            </button>
         </form>
       </div>
     </div>

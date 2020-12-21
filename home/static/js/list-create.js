@@ -295,6 +295,7 @@ function setFieldListOrder(fields) {
     if (i == 0) {
       field['primary'] = true
       field['visible'] = true
+      field['required'] = true
     } else {
       field['primary'] = false
     }

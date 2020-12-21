@@ -617,3 +617,18 @@ def add_record(request, organization_pk, app_pk, list_pk):
         }
 
         return render(request, 'home/workspace.html', context=context)
+
+@login_required
+def save_record(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    print(request.POST)
+
+    # TODO Return page redirect
+    data_dict = {"message": "Success"}
+
+    return JsonResponse(data=data_dict, safe=False)
+    

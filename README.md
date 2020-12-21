@@ -5,6 +5,13 @@
 
 Lorem ipsum
 
+TODO list:
+- User profile account
+- Ajax responses, editing, etc.
+- Managing the form on the front end and saving
+- Editing records they are saved
+
+
 --------------
 
 
