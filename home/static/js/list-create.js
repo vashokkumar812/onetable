@@ -54,6 +54,10 @@ function formatFieldDisplayItem(
                 '<div class="dropdown no-caret">' +
                     '<button class="btn btn-link" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</button>' +
                     '<div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="dropdownMenuButton">' +
+                        '<a class="dropdown-item edit-field" id="edit_' + fieldId + '" href="#">' +
+                          '<div class="dropdown-item-icon"><i class="text-gray-500" data-feather="edit"></i></div>' +
+                          'Edit' +
+                        '</a>' +
                         '<a class="dropdown-item remove-field" id="remove_' + fieldId + '" href="#">' +
                           '<div class="dropdown-item-icon"><i class="text-gray-500" data-feather="delete"></i></div>' +
                           'Delete' +
