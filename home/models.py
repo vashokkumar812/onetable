@@ -5,7 +5,7 @@ import uuid
 from django.contrib.auth.models import User
 from datetime import date
 from django.utils import timezone
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 
 class Organization(models.Model):
     name = models.CharField(max_length=200)
