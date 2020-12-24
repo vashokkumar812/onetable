@@ -391,9 +391,11 @@ $(document).on('click','.move-down', function(e){
 
 $(document).on('click','.edit-field', function(e){
 
-  e.preventDefault();
+  const attrContent = $(this).attr('id');
+  if (attrContent) {
+    e.preventDefault();
 
-  fieldId = $(this).attr('id').replace("edit_","")
-  setFieldEditMode(fieldId)
-
+    fieldId = $(this).attr('id').replace("edit_","");
+    setFieldEditMode(fieldId);
+  }
 });
