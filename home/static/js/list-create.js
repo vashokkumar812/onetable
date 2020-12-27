@@ -94,7 +94,14 @@ function formatFieldEditItem(
 
   // Building the new HTML element
   let fieldEditItem = '' +
-  '<div class="card edit-field mb-2">' +
+  '<div class="card edit-field card-header-actions lift lift-sm h-100 mb-2">' +
+    '<div class="card-header bg-white">' +
+        '<div>' +
+          '<button class="btn btn-link move-up" id="up_' + fieldId + '">Move up</button>' +
+          '<button class="btn btn-link move-down" id="down_' + fieldId + '">Move down</button>' +
+          '<button class="btn btn-link save-changes" id="save_changes_' + fieldId + '">Save Changes</button>' +
+        '</div>' +
+    '</div>' +
     '<div class="card-body">' +
       '<form>' +
         '<div class="row">' +
@@ -223,7 +230,8 @@ function moveElementUp(elementId) {
       let fieldToMoveDown = fields[fieldToMoveUpOrder - 2]
       fieldToMoveUp['order'] = fieldToMoveUpOrder - 1
       fieldToMoveDown['order'] = fieldToMoveUpOrder
-      fields = orderFields(fields)
+      fields = orderFields(fields) // Make sure fields are ordered correctly in local storage
+      fields = setFieldListOrder(fields) // Always make sure primary is required and visible
       localStorage.setItem('fields', JSON.stringify(fields))
       console.log(JSON.parse(localStorage.getItem('fields')))
       refreshFieldDisplay()
@@ -245,7 +253,8 @@ function moveElementDown(elementId) {
     let fieldToMoveUp = fields[fieldToMoveDownOrder]
     fieldToMoveDown['order'] = fieldToMoveDownOrder + 1
     fieldToMoveUp['order'] = fieldToMoveDownOrder
-    fields = orderFields(fields)
+    fields = orderFields(fields) // Make sure fields are ordered correctly in local storage
+    fields = setFieldListOrder(fields) // Always make sure primary is required and visible
     localStorage.setItem('fields', JSON.stringify(fields))
     console.log(JSON.parse(localStorage.getItem('fields')))
     refreshFieldDisplay()
@@ -441,6 +450,51 @@ $(document).on('click','.edit-field', function(e){
 
     fieldId = $(this).attr('id').replace("edit_","");
     setFieldEditMode(fieldId);
+  }
+
+});
+
+$(document).on('click','.save-changes', function(e){
+
+  e.preventDefault();
+
+  fieldId = $(this).attr('id').replace("save_changes_","");
+
+  // Get field values
+  var fieldLabel = $("#field-label-" + fieldId).val()
+  var fieldType = $("#field-type-" + fieldId).val()
+  var required = $("#required-" + fieldId).prop('checked')
+  var visible = $("#visible-" + fieldId).prop('checked')
+
+  // Check to make sure required values are set
+  if(fieldLabel && fieldType){
+
+    // Get current fields and field length
+    let fields = JSON.parse(localStorage.getItem('fields'))
+
+    // Find element in field list
+    let fieldToUpdate = getById(fields, fieldId);
+
+    // Update values for the local storage field object
+    fieldToUpdate['fieldLabel'] = fieldLabel;
+    fieldToUpdate['fieldType'] = fieldType;
+    fieldToUpdate['required'] = required;
+    fieldToUpdate['visible'] = visible;
+
+    // Set edit mode to false
+    fieldToUpdate['editMode'] = false;
+
+    // Make sure primary field is required and visible
+    fields = setFieldListOrder(fields)
+    
+    // Update local storage
+    localStorage.setItem('fields', JSON.stringify(fields))
+
+    // Refresh to close out the edit form for this field
+    refreshFieldDisplay()
+
+  } else{
+    alert("Please fill in all required fields")
   }
 
 });
