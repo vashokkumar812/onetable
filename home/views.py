@@ -467,6 +467,8 @@ def list(request, organization_pk, app_pk, list_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
+    records = Record.objects.all().filter(status='active', list=list)
+
     if request.is_ajax() and request.method == "GET":
 
         html = render_to_string(
@@ -474,7 +476,8 @@ def list(request, organization_pk, app_pk, list_pk):
             context={
                 'organization': organization,
                 'app': app,
-                'list': list
+                'list': list,
+                'records': records
             }
         )
 
@@ -488,6 +491,7 @@ def list(request, organization_pk, app_pk, list_pk):
             'organization': organization,
             'app': app,
             'list': list,
+            'records': records,
             'type': 'list'
         }
 
@@ -635,8 +639,6 @@ def update_list(request, organization_pk, app_pk, list_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
-    list_fields = ListField.objects.all().filter(status='active', list=list)
-
     if request.is_ajax and request.method == "POST":
 
         list_name = request.POST.get('list_name', None)
@@ -723,6 +725,8 @@ def add_record(request, organization_pk, app_pk, list_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
+    list_fields = ListField.objects.all().filter(status='active', list=list).order_by('order')
+
     if request.is_ajax() and request.method == "GET":
 
         html = render_to_string(
@@ -730,7 +734,8 @@ def add_record(request, organization_pk, app_pk, list_pk):
             context={
                 'organization': organization,
                 'app': app,
-                'list': list
+                'list': list,
+                'list_fields': list_fields
             }
         )
 
@@ -744,6 +749,7 @@ def add_record(request, organization_pk, app_pk, list_pk):
             'organization': organization,
             'app': app,
             'list': list,
+            'list_fields': list_fields,
             'type': 'add-record'
         }
 
@@ -756,9 +762,10 @@ def save_record(request, organization_pk, app_pk, list_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
-    fields = request.POST['field_values']
+    fields = json.loads(request.POST['field_values'])
 
-    # TODO add error handling here
+    # TODO add error handling here to check values and fields
+    # list_fields = ListField.objects.all().filter(status='active', list=list)
 
     # Add a new record
     record = Record.objects.create(
@@ -769,7 +776,28 @@ def save_record(request, organization_pk, app_pk, list_pk):
         created_user=request.user)
     record.save();
 
+    for field in fields:
+        try:
+            # Print for testing / temporary
+            print('---------------')
+            print(field['fieldId'])
+            print(field['fieldValue'])
 
+            # Get the associated list field
+            list_field = ListField.objects.get(status='active', field_id=field['fieldId'], list=list)
+
+            record_field = RecordField.objects.create(
+                record=record,
+                list_field=list_field,
+                value=field['fieldValue'],
+                status='active',
+                created_at=timezone.now(),
+                created_user=request.user)
+            record_field.save();
+
+        except ListField.DoesNotExist:
+            # Easy error handling for now
+            pass
 
     # TODO Return page redirect
     data_dict = {"message": "Success"}

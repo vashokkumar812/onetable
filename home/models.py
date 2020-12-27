@@ -157,6 +157,10 @@ class List(models.Model):
         default='active',
     )
 
+    @property
+    def list_fields(self):
+        return ListField.objects.filter(list=self, status='active')
+
     def __str__(self):
         return self.name
 
@@ -206,6 +210,10 @@ class Record(models.Model):
         blank=False,
         default='active',
     )
+
+    @property
+    def record_fields(self):
+        return RecordField.objects.filter(record=self, status='active')
 
     def __str__(self):
         return self.id
