@@ -205,14 +205,11 @@ function removeElement(elementId) {
 
     // Remove from local storage
     const currentItems = JSON.parse(localStorage.getItem('fields'))
-    let afterRemoved = currentItems.filter(field => field.id !== fieldId)
-    const fields = setFieldListOrder(afterRemoved)
+    let afterRemovedList = currentItems.filter(field => field.id !== fieldId)
+    let fields = orderFields(afterRemovedList) // Make sure fields are ordered correctly in local storage
+    fields = setFieldListOrder(fields) // Always make sure primary is required and visible
     localStorage.setItem('fields', JSON.stringify(fields))
-    console.log(JSON.parse(localStorage.getItem('fields')))
-
-    // Remove from display
-    const element = document.getElementById(elementId);
-    element.parentNode.removeChild(element);
+    refreshFieldDisplay()
 
 }
 
@@ -226,15 +223,16 @@ function moveElementUp(elementId) {
     let fieldToMoveUp = getById(fields, elementId);
     const fieldToMoveUpOrder = fieldToMoveUp['order']
 
-    if(fieldToMoveUpOrder > 1) {
+    if(fieldToMoveUpOrder > 1) { // Move up if not already the first item
+
       let fieldToMoveDown = fields[fieldToMoveUpOrder - 2]
       fieldToMoveUp['order'] = fieldToMoveUpOrder - 1
       fieldToMoveDown['order'] = fieldToMoveUpOrder
       fields = orderFields(fields) // Make sure fields are ordered correctly in local storage
       fields = setFieldListOrder(fields) // Always make sure primary is required and visible
       localStorage.setItem('fields', JSON.stringify(fields))
-      console.log(JSON.parse(localStorage.getItem('fields')))
       refreshFieldDisplay()
+
     }
 
 }
@@ -249,15 +247,16 @@ function moveElementDown(elementId) {
   let fieldToMoveDown = getById(fields, elementId);
   const fieldToMoveDownOrder = fieldToMoveDown['order']
 
-  if(fieldToMoveDownOrder < fieldsLength) {
+  if(fieldToMoveDownOrder < fieldsLength) { // Only move down if not the first item
+
     let fieldToMoveUp = fields[fieldToMoveDownOrder]
     fieldToMoveDown['order'] = fieldToMoveDownOrder + 1
     fieldToMoveUp['order'] = fieldToMoveDownOrder
     fields = orderFields(fields) // Make sure fields are ordered correctly in local storage
     fields = setFieldListOrder(fields) // Always make sure primary is required and visible
     localStorage.setItem('fields', JSON.stringify(fields))
-    console.log(JSON.parse(localStorage.getItem('fields')))
     refreshFieldDisplay()
+
   }
 
 }
@@ -272,7 +271,7 @@ function setFieldEditMode(elementId) {
   fieldToEdit['editMode'] = true;
 
   localStorage.setItem('fields', JSON.stringify(fields))
-  console.log(JSON.parse(localStorage.getItem('fields')))
+
   refreshFieldDisplay()
 
 }
@@ -287,6 +286,8 @@ function refreshFieldDisplay(){
   fields.forEach(function(field){
     addFieldElement(field)
   });
+
+  console.log(JSON.parse(localStorage.getItem('fields')))
 
 }
 
@@ -402,7 +403,6 @@ $(document).on('click','#add-field', function(e){
     fields.push(field)
     fields = setFieldListOrder(fields)
     localStorage.setItem('fields', JSON.stringify(fields))
-    console.log(JSON.parse(localStorage.getItem('fields')))
 
     // Add field to the display
     addFieldElement(field)
@@ -486,7 +486,7 @@ $(document).on('click','.save-changes', function(e){
 
     // Make sure primary field is required and visible
     fields = setFieldListOrder(fields)
-    
+
     // Update local storage
     localStorage.setItem('fields', JSON.stringify(fields))
 
