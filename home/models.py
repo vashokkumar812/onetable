@@ -169,6 +169,7 @@ class ListField(models.Model):
     field_id = models.CharField(max_length=10)
     field_label = models.TextField()
     field_type = models.CharField(max_length=200)
+    primary = models.BooleanField()
     required = models.BooleanField()
     visible = models.BooleanField()
     order = models.IntegerField()
@@ -214,6 +215,10 @@ class Record(models.Model):
     @property
     def record_fields(self):
         return RecordField.objects.filter(record=self, status='active')
+
+    @property
+    def primary_field(self):
+        return RecordField.objects.get(record=self, status='active', list_field__primary=True, list_field__status='active')
 
     def __str__(self):
         return self.id

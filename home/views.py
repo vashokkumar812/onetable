@@ -534,7 +534,6 @@ def edit_list(request, organization_pk, app_pk, list_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
-    lists = List.objects.all().filter(status='active', app=app)
 
     if request.is_ajax() and request.method == "GET":
 
@@ -543,7 +542,7 @@ def edit_list(request, organization_pk, app_pk, list_pk):
             context={
                 'organization': organization,
                 'app': app,
-                'list_id': list.id
+                'list': list
             }
         )
 
@@ -556,7 +555,7 @@ def edit_list(request, organization_pk, app_pk, list_pk):
         context = {
             'organization': organization,
             'app': app,
-            'list_id': list.id,
+            'list_id': list_pk,
             'type': 'edit-list'
         }
 
@@ -578,6 +577,7 @@ def list_details(request, organization_pk, app_pk, list_pk):
         field_object['fieldLabel'] = field.field_label
         field_object['fieldType'] = field.field_type
         field_object['required'] = field.required
+        field_object['primary'] = field.primary
         field_object['visible'] = field.visible
         field_object['order'] = field.order
 
@@ -621,6 +621,7 @@ def save_list(request, organization_pk, app_pk):
                 field_type=field['fieldType'],
                 required=field['required'],
                 visible=field['visible'],
+                primary=field['primary'],
                 order=field['order'],
                 status='active',
                 created_at=timezone.now(),
@@ -659,6 +660,7 @@ def update_list(request, organization_pk, app_pk, list_pk):
                 list_field.fieldType = field['fieldType']
                 list_field.required = field['required']
                 list_field.visible = field['visible']
+                list_field.primary = field['primary']
                 list_field.order = field['order']
                 list_field.save()
             except ListField.DoesNotExist:
@@ -670,6 +672,7 @@ def update_list(request, organization_pk, app_pk, list_pk):
                     field_type=field['fieldType'],
                     required=field['required'],
                     visible=field['visible'],
+                    primary=field['primary'],
                     order=field['order'],
                     status='active',
                     created_at=timezone.now(),
@@ -793,7 +796,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                 status='active',
                 created_at=timezone.now(),
                 created_user=request.user)
-            record_field.save();
+            record_field.save()
 
         except ListField.DoesNotExist:
             # Easy error handling for now
