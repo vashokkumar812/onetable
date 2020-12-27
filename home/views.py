@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 import json
+from django.core import serializers
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List
 from .forms import OrganizationForm, AppForm
@@ -524,6 +525,57 @@ def create_list(request, organization_pk, app_pk):
         return render(request, 'home/workspace.html', context=context)
 
 @login_required
+def edit_list(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+    lists = List.objects.all().filter(status='active', app=app)
+
+    if request.is_ajax() and request.method == "GET":
+
+        html = render_to_string(
+            template_name="home/list-create.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'list_id': list.id
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list_id': list.id,
+            'type': 'edit-list'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
+
+@login_required
+def list_details(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    if request.is_ajax() and request.method == "GET":
+
+        # Get the list details required for editing
+        list_details = {}
+        list_details['name'] = list.name
+        list_details['fields'] = list.fields
+
+        return JsonResponse(data=list_details, safe=False)
+
+
+@login_required
 def save_list(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -535,15 +587,6 @@ def save_list(request, organization_pk, app_pk):
 
         field_list = json.loads(request.POST['fields'])
 
-        for field in field_list:
-
-            fieldLabel = field['fieldLabel']
-            fieldType = field['fieldType']
-            required = field['required']
-            visible = field['visible']
-            primary = field['primary']
-            order = field['order']
-
         list = List.objects.create(
             name=list_name,
             app=app,
@@ -551,6 +594,29 @@ def save_list(request, organization_pk, app_pk):
             created_at=timezone.now(),
             created_user=request.user,
             fields=field_list)
+        list.save();
+
+        # TODO Return page redirect
+        data_dict = {"message": "Success"}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+@login_required
+def update_list(request, organization_pk, app_pk, list_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+
+    if request.is_ajax and request.method == "POST":
+
+        list_name = request.POST.get('list_name', None)
+
+        field_list = json.loads(request.POST['fields'])
+
+        list.name=list_name
+        list.last_updated = timezone.now()
+        list.fields = field_list
         list.save();
 
         # TODO Return page redirect
