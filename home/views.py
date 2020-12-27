@@ -631,4 +631,3 @@ def save_record(request, organization_pk, app_pk, list_pk):
     data_dict = {"message": "Success"}
 
     return JsonResponse(data=data_dict, safe=False)
-    

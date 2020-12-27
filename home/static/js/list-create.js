@@ -62,6 +62,7 @@ function formatFieldDisplayItem(
                           '<div class="dropdown-item-icon"><i class="text-gray-500" data-feather="delete"></i></div>' +
                           'Delete' +
                         '</a>' +
+
                     '</div>' +
                 '</div>' +
             '</div>' +
@@ -93,7 +94,7 @@ function formatFieldEditItem(
 
   // Building the new HTML element
   let fieldEditItem = '' +
-  '<div class="card edit-field">' +
+  '<div class="card edit-field mb-2">' +
     '<div class="card-body">' +
       '<form>' +
         '<div class="row">' +
@@ -115,7 +116,7 @@ function formatFieldEditItem(
                     '<option value="select-one-option">Select One Option</option>' +
                     '<option value="select-multiple-option">Select Multiple Options</option>' +
                     '<option value="select-one-list">Select One List</option>' +
-                    '<option value="select-multiple-lists">Select Multiple Lists</option>' +
+                    '<option value="select-multiple-list">Select Multiple Lists</option>' +
                 '</select>' +
             '</div>' +
           '</div>' +
@@ -134,7 +135,50 @@ function formatFieldEditItem(
         '</div>' +
       '</form>' +
     '</div>' +
-  '</div>'
+  '</div>';
+
+
+  // Select the correct values for edit input boxes
+
+  if (required) {
+    fieldEditItem = fieldEditItem.replace('id="required-' + fieldId + '" type="checkbox"', 'id="required-' + fieldId + '" type="checkbox" checked')
+  }
+
+  if (visible) {
+    fieldEditItem = fieldEditItem.replace('id="visible-' + fieldId + '" type="checkbox"', 'id="visible-' + fieldId + '" type="checkbox" checked')
+  }
+
+  if (fieldType == 'text') {
+    fieldEditItem = fieldEditItem.replace('<option value="text">Text</option>', '<option value="text" selected>Text</option>')
+  }
+
+  if (fieldType == 'long-text') {
+    fieldEditItem = fieldEditItem.replace('<option value="long-text">Long Text</option>', '<option value="long-text" selected>Long Text</option>')
+  }
+
+  if (fieldType == 'number') {
+    fieldEditItem = fieldEditItem.replace('<option value="number">Number</option>', '<option value="number" selected>Number</option>')
+  }
+
+  if (fieldType == 'decimal') {
+    fieldEditItem = fieldEditItem.replace('<option value="decimal">Decimal</option>', '<option value="decimal" selected>Decimal</option>')
+  }
+
+  if (fieldType == 'select-one-option') {
+    fieldEditItem = fieldEditItem.replace('<option value="select-one-option">Select One Option</option>', '<option value="select-one-option" selected>Select One Option</option>')
+  }
+
+  if (fieldType == 'select-multiple-option') {
+    fieldEditItem = fieldEditItem.replace('<option value="select-multiple-option">Select Multiple Options</option>', '<option value="select-multiple-option" selected>Select Multiple Options</option>')
+  }
+
+  if (fieldType == 'select-one-list') {
+    fieldEditItem = fieldEditItem.replace('<option value="select-one-list">Select One List</option>', '<option value="select-one-list" selected>Select One List</option>')
+  }
+
+  if (fieldType == 'select-multiple-list') {
+    fieldEditItem = fieldEditItem.replace('<option value="select-multiple-list">Select Multiple Lists</option>', '<option value="select-multiple-list" selected>Select Multiple Lists</option>')
+  }
 
   return fieldEditItem
 
@@ -398,4 +442,5 @@ $(document).on('click','.edit-field', function(e){
     fieldId = $(this).attr('id').replace("edit_","");
     setFieldEditMode(fieldId);
   }
+
 });

@@ -13,7 +13,7 @@ class OrganizationForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }
 
-class AppForm(forms.ModelForm):
+class AppForm(forms.ModelForm): #(Workspaces)
 
     class Meta:
         model = App
