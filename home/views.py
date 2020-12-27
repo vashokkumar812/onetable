@@ -650,8 +650,8 @@ def update_list(request, organization_pk, app_pk, list_pk):
 
         # Loop through and update or add the fields
         for field in field_list:
-            list_field = ListField.objects.get(status='active', field_id=field['id'], list=list)
-            if list_field is not None:
+            try:
+                list_field = ListField.objects.get(status='active', field_id=field['id'], list=list)
                 # Update the old list field database record
                 list_field.field_label = field['fieldLabel']
                 list_field.fieldType = field['fieldType']
@@ -659,7 +659,7 @@ def update_list(request, organization_pk, app_pk, list_pk):
                 list_field.visible = field['visible']
                 list_field.order = field['order']
                 list_field.save()
-            else:
+            except ListField.DoesNotExist:
                 # Create a new list field in the database
                 list_field = ListField.objects.create(
                     list=list,
@@ -674,14 +674,17 @@ def update_list(request, organization_pk, app_pk, list_pk):
                     created_user=request.user)
                 list_field.save();
 
-        for field in removed_fields:
-            # Set the field status to deleted
-            list_field = ListField.objects.get(status='active', field_id=field.id, list=list)
-            if list_field is not None:
+        for field_id in removed_fields:
+            try:
+                list_field = ListField.objects.get(status='active', field_id=field_id, list=list)
                 list_field.status = "deleted"
                 list_field.save()
+            except ListField.DoesNotExist:
+                # Do nothing - field already removed somehow
+                pass
 
         # TODO Return page redirect
+
         data_dict = {"message": "Success"}
 
         return JsonResponse(data=data_dict, safe=False)
