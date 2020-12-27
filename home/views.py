@@ -8,7 +8,7 @@ from django.utils import timezone
 import json
 from django.core import serializers
 
-from .models import Organization, OrganizationUser, App, AppUser, Menu, List
+from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
 from .forms import OrganizationForm, AppForm
 
 #===============================================================================
@@ -565,12 +565,26 @@ def list_details(request, organization_pk, app_pk, list_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
+    list_fields = ListField.objects.all().filter(status='active', list=list).order_by('order')
+    fields = []
+    for field in list_fields:
+
+        field_object = {}
+        field_object['id'] = field.field_id
+        field_object['fieldLabel'] = field.field_label
+        field_object['fieldType'] = field.field_type
+        field_object['required'] = field.required
+        field_object['visible'] = field.visible
+        field_object['order'] = field.order
+
+        fields.append(field_object)
+
     if request.is_ajax() and request.method == "GET":
 
         # Get the list details required for editing
         list_details = {}
         list_details['name'] = list.name
-        list_details['fields'] = list.fields
+        list_details['fields'] = fields
 
         return JsonResponse(data=list_details, safe=False)
 
@@ -592,9 +606,22 @@ def save_list(request, organization_pk, app_pk):
             app=app,
             status='active',
             created_at=timezone.now(),
-            created_user=request.user,
-            fields=field_list)
+            created_user=request.user)
         list.save();
+
+        for field in field_list:
+            list_field = ListField.objects.create(
+                list=list,
+                field_id=field['id'],
+                field_label=field['fieldLabel'],
+                field_type=field['fieldType'],
+                required=field['required'],
+                visible=field['visible'],
+                order=field['order'],
+                status='active',
+                created_at=timezone.now(),
+                created_user=request.user)
+            list_field.save();
 
         # TODO Return page redirect
         data_dict = {"message": "Success"}
@@ -608,16 +635,51 @@ def update_list(request, organization_pk, app_pk, list_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
+    list_fields = ListField.objects.all().filter(status='active', list=list)
+
     if request.is_ajax and request.method == "POST":
 
         list_name = request.POST.get('list_name', None)
+        if list_name is not list.name:
+            list.name=list_name
+            list.last_updated = timezone.now()
+            list.save();
 
         field_list = json.loads(request.POST['fields'])
+        removed_fields = json.loads(request.POST['removed'])
 
-        list.name=list_name
-        list.last_updated = timezone.now()
-        list.fields = field_list
-        list.save();
+        # Loop through and update or add the fields
+        for field in field_list:
+            list_field = ListField.objects.get(status='active', field_id=field['id'], list=list)
+            if list_field is not None:
+                # Update the old list field database record
+                list_field.field_label = field['fieldLabel']
+                list_field.fieldType = field['fieldType']
+                list_field.required = field['required']
+                list_field.visible = field['visible']
+                list_field.order = field['order']
+                list_field.save()
+            else:
+                # Create a new list field in the database
+                list_field = ListField.objects.create(
+                    list=list,
+                    field_id=field['id'],
+                    field_label=field['fieldLabel'],
+                    field_type=field['fieldType'],
+                    required=field['required'],
+                    visible=field['visible'],
+                    order=field['order'],
+                    status='active',
+                    created_at=timezone.now(),
+                    created_user=request.user)
+                list_field.save();
+
+        for field in removed_fields:
+            # Set the field status to deleted
+            list_field = ListField.objects.get(status='active', field_id=field.id, list=list)
+            if list_field is not None:
+                list_field.status = "deleted"
+                list_field.save()
 
         # TODO Return page redirect
         data_dict = {"message": "Success"}
@@ -691,7 +753,35 @@ def save_record(request, organization_pk, app_pk, list_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
-    print(request.POST)
+    fields = request.POST['field_values']
+
+    # TODO add error handling here
+
+    # Add a new record
+    record = Record.objects.create(
+        list=list,
+        status='active',
+        created_at=timezone.now(),
+        last_updated=timezone.now(),
+        created_user=request.user)
+    record.save();
+
+
+
+    # TODO Return page redirect
+    data_dict = {"message": "Success"}
+
+    return JsonResponse(data=data_dict, safe=False)
+
+@login_required
+def update_record(request, organization_pk, app_pk, list_pk, record_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+    record = get_object_or_404(Record, pk=record_pk)
+
+    print(json.loads(request.POST['field_values']))
 
     # TODO Return page redirect
     data_dict = {"message": "Success"}

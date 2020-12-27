@@ -5,6 +5,9 @@ const addField = document.getElementById('addField')
 const fields = []
 localStorage.setItem('fields', JSON.stringify(fields))
 
+const removed = []
+localStorage.setItem('removed', JSON.stringify(removed))
+
 function addFieldElement(field) {
 
   // Get new item attrs
@@ -209,6 +212,11 @@ function removeElement(elementId) {
     let fields = orderFields(afterRemovedList) // Make sure fields are ordered correctly in local storage
     fields = setFieldListOrder(fields) // Always make sure primary is required and visible
     localStorage.setItem('fields', JSON.stringify(fields))
+
+    const removedItems = JSON.parse(localStorage.getItem('removed'))
+    removedItems.push(fieldId)
+    localStorage.setItem('removed', JSON.stringify(removedItems))
+
     refreshFieldDisplay()
 
 }
@@ -231,6 +239,7 @@ function moveElementUp(elementId) {
       fields = orderFields(fields) // Make sure fields are ordered correctly in local storage
       fields = setFieldListOrder(fields) // Always make sure primary is required and visible
       localStorage.setItem('fields', JSON.stringify(fields))
+
       refreshFieldDisplay()
 
     }

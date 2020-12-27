@@ -9,7 +9,7 @@
                   </h1>
               </div>
               <div class="col-12 col-xl-auto mb-3">
-                  <button class="btn btn-primary py-2">Save Record</button>
+                  <button class="btn btn-primary py-2" id="add-record">Save Record</button>
               </div>
           </div>
       </div>
@@ -19,23 +19,20 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="sbp-preview-content">
-        <form method="POST" action="{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}">{% csrf_token %}
+        <form id="record-form">{% csrf_token %}
             {% for field in list.fields%}
               {% if field.fieldType == 'text' %}
                 <div class="form-group">
-                  <label for="field_{{ field.id }}">{{ field.fieldLabel }}</label>
-                  <input class="form-control form-control-solid" id="field_{{ field.id }}" type="text" placeholder="Input response here">
+                  <label for="field_{{ field.id }}">{{ field.fieldLabel }}{% if field.required %}*{% endif %}</label>
+                  <input class="form-control form-control-solid record-field" id="field_{{ field.id }}" type="text" placeholder="Input response here">
                 </div>
               {% elif field.fieldType == 'long-text' %}
                 <div class="form-group">
                   <label for="field_{{ field.id }}">{{ field.fieldLabel }}</label>
-                  <textarea class="form-control form-control-solid" id="field_{{ field.id }}" rows="3"></textarea>
+                  <textarea class="form-control form-control-solid record-field" id="field_{{ field.id }}" rows="3" placeholder="Input response here"></textarea>
                 </div>
               {% endif %}
             {% endfor %}
-            <button type="submit" class="btn btn-lg btn-primary font-weight-500 mr-3">
-              Save record
-            </button>
         </form>
       </div>
     </div>

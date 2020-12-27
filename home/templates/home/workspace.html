@@ -169,6 +169,8 @@ class="bg-white"
         e.preventDefault();
 
         let fields = JSON.parse(localStorage.getItem('fields'))
+        let added = JSON.parse(localStorage.getItem('added'))
+        let removed = JSON.parse(localStorage.getItem('removed'))
 
         let list_name = $('#list_name').val()
 
@@ -179,6 +181,8 @@ class="bg-white"
             data: {
                 'list_name': list_name,
                 'fields': JSON.stringify(fields),
+                'added': JSON.stringify(added),
+                'removed': JSON.stringify(removed),
                 'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
             },
             success: function(data) {
@@ -201,6 +205,8 @@ class="bg-white"
         e.preventDefault();
 
         let fields = JSON.parse(localStorage.getItem('fields'))
+        let added = JSON.parse(localStorage.getItem('added'))
+        let removed = JSON.parse(localStorage.getItem('removed'))
 
         let list_name = $('#list_name').val()
 
@@ -211,6 +217,8 @@ class="bg-white"
             data: {
                 'list_name': list_name,
                 'fields': JSON.stringify(fields),
+                'added': JSON.stringify(added),
+                'removed': JSON.stringify(removed),
                 'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
             },
             success: function(data) {
@@ -229,7 +237,6 @@ class="bg-white"
   // Load the list fields if in list edit mode
   {% if list_id and type == 'edit-list' %}
   $( document ).ready(function(){
-
     $.ajax({
         url: "{% url 'list_details' organization_pk=organization.pk app_pk=app.pk list_pk=list_id %}",
         type: 'get',
@@ -240,11 +247,13 @@ class="bg-white"
             $('#list_name').val(data.name)
 
             // Save fields to local storage
+            $.each(data.fields, function(index, field) {
+              field['editMode'] = false;
+            });
             localStorage.setItem('fields', JSON.stringify(data.fields))
 
             // Display the list
             refreshFieldDisplay()
-
 
         },
         error: function (xhr, ajaxOptions, thrownError) {
