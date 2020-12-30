@@ -8,7 +8,7 @@
                   </h1>
               </div>
               <div class="col-12 col-xl-auto mb-3">
-                <div class="page-header-subtitle"><a href="#">Add new record</a></div>
+                <div class="page-header-subtitle"><a href="{% url 'add_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}">Add new record</a></div>
               </div>
           </div>
       </div>

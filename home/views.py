@@ -561,6 +561,7 @@ def edit_list(request, organization_pk, app_pk, list_pk):
 
         return render(request, 'home/workspace.html', context=context)
 
+# Ajax call for pulling the fields once the edit screen is loaded
 @login_required
 def list_details(request, organization_pk, app_pk, list_pk):
 
@@ -724,21 +725,139 @@ def list_settings(request, organization_pk, app_pk, list_pk):
 @login_required
 def add_record(request, organization_pk, app_pk, list_pk):
 
+        organization = get_object_or_404(Organization, pk=organization_pk)
+        app = get_object_or_404(App, pk=app_pk)
+        list = get_object_or_404(List, pk=list_pk)
+
+        fields = []
+        for list_field in list.list_fields:
+
+            field_object = {}
+            field_object['field_id'] = list_field.field_id
+            field_object['field_label'] = list_field.field_label
+            field_object['field_type'] = list_field.field_type
+            field_object['required'] = list_field.required
+            field_object['primary'] = list_field.primary
+            field_object['visible'] = list_field.visible
+            field_object['order'] = list_field.order
+
+            fields.append(field_object)
+
+        if request.is_ajax() and request.method == "GET":
+
+            html = render_to_string(
+                template_name="home/record-create.html",
+                context={
+                    'organization': organization,
+                    'app': app,
+                    'list': list,
+                    'fields': fields
+                }
+            )
+
+            data_dict = {"html_from_view": html}
+
+            return JsonResponse(data=data_dict, safe=False)
+
+        else:
+
+            context = {
+                'organization': organization,
+                'app': app,
+                'list': list,
+                'fields': fields,
+                'type': 'edit-record'
+            }
+
+            return render(request, 'home/workspace.html', context=context)
+
+@login_required
+def save_record(request, organization_pk, app_pk, list_pk):
+
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
-    list_fields = ListField.objects.all().filter(status='active', list=list).order_by('order')
+    record_id = request.POST.get('record_id', None)
+    fields = json.loads(request.POST['field_values'])
+
+    print(fields)
+
+    record = None # Create object globally outside of the if/else
+    if record_id is not None:
+        # Get the existing record / this is a record being edited
+        record = get_object_or_404(Record, pk=record_id)
+    else:
+        # Add a new record
+        record = Record.objects.create(
+            list=list,
+            status='active',
+            created_at=timezone.now(),
+            last_updated=timezone.now(),
+            created_user=request.user)
+        record.save();
+
+    for field in fields:
+
+            # Print for testing / temporary
+            print('---------------')
+            print(field['fieldId'])
+            print(field['fieldValue'])
+
+            # Get the associated list field
+            if record_id is not None:
+
+                try:
+                    # Update existing record field
+                    record_field = RecordField.objects.get(status='active', list_field__field_id=field['fieldId'], record=record)
+                    record_field.value = field['fieldValue']
+                    record_field.last_updated = timezone.now()
+                    record_field.save()
+
+                except RecordField.DoesNotExist:
+                    pass
+
+            else:
+
+                try:
+
+                    list_field = ListField.objects.get(status='active', field_id=field['fieldId'], list=list)
+
+                    record_field = RecordField.objects.create(
+                        record=record,
+                        list_field=list_field,
+                        value=field['fieldValue'],
+                        status='active',
+                        created_at=timezone.now(),
+                        created_user=request.user)
+                    record_field.save()
+
+                except ListField.DoesNotExist:
+                    # Easy error handling for now
+                    pass
+
+    # TODO Return page redirect
+    data_dict = {"message": "Success"}
+
+    return JsonResponse(data=data_dict, safe=False)
+
+@login_required
+def record_details(request, organization_pk, app_pk, list_pk, record_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+    record = get_object_or_404(Record, pk=record_pk)
 
     if request.is_ajax() and request.method == "GET":
 
         html = render_to_string(
-            template_name="home/add-record.html",
+            template_name="home/record-details.html",
             context={
                 'organization': organization,
                 'app': app,
                 'list': list,
-                'list_fields': list_fields
+                'record': record
             }
         )
 
@@ -752,60 +871,70 @@ def add_record(request, organization_pk, app_pk, list_pk):
             'organization': organization,
             'app': app,
             'list': list,
-            'list_fields': list_fields,
-            'type': 'add-record'
+            'record': record,
+            'type': 'record-details'
         }
 
         return render(request, 'home/workspace.html', context=context)
 
+
 @login_required
-def save_record(request, organization_pk, app_pk, list_pk):
+def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
+    record = get_object_or_404(Record, pk=record_pk)
 
-    fields = json.loads(request.POST['field_values'])
+    fields = []
+    for list_field in list.list_fields:
 
-    # TODO add error handling here to check values and fields
-    # list_fields = ListField.objects.all().filter(status='active', list=list)
+        field_object = {}
+        field_object['field_id'] = list_field.field_id
+        field_object['field_label'] = list_field.field_label
+        field_object['field_type'] = list_field.field_type
+        field_object['required'] = list_field.required
+        field_object['primary'] = list_field.primary
+        field_object['visible'] = list_field.visible
+        field_object['order'] = list_field.order
 
-    # Add a new record
-    record = Record.objects.create(
-        list=list,
-        status='active',
-        created_at=timezone.now(),
-        last_updated=timezone.now(),
-        created_user=request.user)
-    record.save();
+        # Get the field value if it exists
+        for record_field in record.record_fields:
+            if list_field.id == record_field.list_field.id:
+                field_object['value'] = record_field.value
 
-    for field in fields:
-        try:
-            # Print for testing / temporary
-            print('---------------')
-            print(field['fieldId'])
-            print(field['fieldValue'])
+        fields.append(field_object)
 
-            # Get the associated list field
-            list_field = ListField.objects.get(status='active', field_id=field['fieldId'], list=list)
+    if request.is_ajax() and request.method == "GET":
 
-            record_field = RecordField.objects.create(
-                record=record,
-                list_field=list_field,
-                value=field['fieldValue'],
-                status='active',
-                created_at=timezone.now(),
-                created_user=request.user)
-            record_field.save()
+        html = render_to_string(
+            template_name="home/record-create.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'list': list,
+                'fields': fields,
+                'record': record
+            }
+        )
 
-        except ListField.DoesNotExist:
-            # Easy error handling for now
-            pass
+        data_dict = {"html_from_view": html}
 
-    # TODO Return page redirect
-    data_dict = {"message": "Success"}
+        return JsonResponse(data=data_dict, safe=False)
 
-    return JsonResponse(data=data_dict, safe=False)
+    else:
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list': list,
+            'record': record,
+            'fields': fields,
+            'type': 'edit-record'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
+
 
 @login_required
 def update_record(request, organization_pk, app_pk, list_pk, record_pk):

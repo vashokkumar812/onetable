@@ -36,6 +36,8 @@ urlpatterns = [
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/archive', views.archive_list, name='archive_list'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/add-record', views.add_record, name='add_record'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/save-record', views.save_record, name='save_record'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/records/<int:record_pk>/details', views.record_details, name='record_details'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/records/<int:record_pk>/edit', views.edit_record, name='edit_record'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/records/<int:record_pk>/update', views.update_record, name='update_record'),
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/notes/', views.notes, name='notes'),

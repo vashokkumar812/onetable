@@ -20,16 +20,21 @@
     <div class="card-body">
       <div class="sbp-preview-content">
         <form id="record-form">{% csrf_token %}
-            {% for field in list_fields%}
+            {% for field in fields %}
               {% if field.field_type == 'text' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" type="text" placeholder="Input response here">
+                  <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" type="text" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %}>
                 </div>
               {% elif field.field_type == 'long-text' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <textarea class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" rows="3" placeholder="Input response here"></textarea>
+                  <textarea class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" rows="3" placeholder="Input response here">{% if field.value %}{{ field.value }}{% endif %}</textarea>
+                </div>
+              {% elif field.field_type == 'number' %}
+                <div class="form-group">
+                  <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
+                  <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" type="number" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %}>
                 </div>
               {% endif %}
             {% endfor %}

@@ -159,7 +159,7 @@ class List(models.Model):
 
     @property
     def list_fields(self):
-        return ListField.objects.filter(list=self, status='active')
+        return ListField.objects.filter(list=self, status='active').order_by('order')
 
     def __str__(self):
         return self.name
