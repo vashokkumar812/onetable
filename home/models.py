@@ -27,6 +27,8 @@ class Organization(models.Model):
         default='active',
     )
 
+    # TODO add @property for organization users
+
     def __str__(self):
         return self.name
 
@@ -79,6 +81,8 @@ class App(models.Model):
         blank=False,
         default='active',
     )
+
+    # TODO add @property for app users
 
     def __str__(self):
         return self.name

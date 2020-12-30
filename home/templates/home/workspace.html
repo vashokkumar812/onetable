@@ -241,7 +241,7 @@ class="bg-white"
   {% if list_id and type == 'edit-list' %}
   $( document ).ready(function(){
     $.ajax({
-        url: "{% url 'list_details' organization_pk=organization.pk app_pk=app.pk list_pk=list_id %}",
+        url: "{% url 'list_fields' organization_pk=organization.pk app_pk=app.pk list_pk=list_id %}",
         type: 'get',
         dataType: 'json',
         success: function(data){

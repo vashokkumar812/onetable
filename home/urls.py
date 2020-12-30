@@ -21,15 +21,11 @@ urlpatterns = [
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/edit', views.edit_app, name='edit_app'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/archive', views.archive_app, name='archive_app'),
 
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/add-menu/', views.add_menu, name='add_menu'),
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/<int:menu_pk>/edit', views.edit_menu, name='edit_menu'),
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/<int:menu_pk>/archive', views.archive_menu, name='archive_menu'),
-
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/', views.lists, name='lists'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/create-list/', views.create_list, name='create_list'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/save-list/', views.save_list, name='save_list'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>', views.list, name='list'),
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/details', views.list_details, name='list_details'),
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/fields', views.list_fields, name='list_fields'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/edit', views.edit_list, name='edit_list'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/update', views.update_list, name='update_list'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/settings', views.list_settings, name='list_settings'),
@@ -38,7 +34,6 @@ urlpatterns = [
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/save-record', views.save_record, name='save_record'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/records/<int:record_pk>/details', views.record_details, name='record_details'),
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/records/<int:record_pk>/edit', views.edit_record, name='edit_record'),
-    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/records/<int:record_pk>/update', views.update_record, name='update_record'),
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/notes/', views.notes, name='notes'),
 
