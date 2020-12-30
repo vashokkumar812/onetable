@@ -24,7 +24,7 @@
           <div class="card-body">
             {% if record.record_fields %}
               {% for field in record.record_fields %}
-                {% if field.list_field.visible and field.list_field.primary is False %}
+                {% if field.list_field.visible and field.list_field.primary is False and field.value %}
                   <p>{{ field.list_field.field_label }}: {{ field.value }}</p>
                 {% endif %}
               {% endfor %}

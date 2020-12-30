@@ -122,11 +122,6 @@ function formatFieldEditItem(
                     '<option value="text">Text</option>' +
                     '<option value="long-text">Long Text</option>' +
                     '<option value="number">Number</option>' +
-                    '<option value="decimal">Decimal</option>' +
-                    '<option value="select-one-option">Select One Option</option>' +
-                    '<option value="select-multiple-option">Select Multiple Options</option>' +
-                    '<option value="select-one-list">Select One List</option>' +
-                    '<option value="select-multiple-list">Select Multiple Lists</option>' +
                 '</select>' +
             '</div>' +
           '</div>' +

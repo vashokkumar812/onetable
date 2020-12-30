@@ -815,7 +815,25 @@ def save_record(request, organization_pk, app_pk, list_pk):
                     record_field.save()
 
                 except RecordField.DoesNotExist:
-                    pass
+
+                    # This record field has not been saved before, so create it
+                    # Note this is redundant with below / can be consolidated
+                    try:
+
+                        list_field = ListField.objects.get(status='active', field_id=field['fieldId'], list=list)
+
+                        record_field = RecordField.objects.create(
+                            record=record,
+                            list_field=list_field,
+                            value=field['fieldValue'],
+                            status='active',
+                            created_at=timezone.now(),
+                            created_user=request.user)
+                        record_field.save()
+
+                    except ListField.DoesNotExist:
+                        # Easy error handling for now
+                        pass
 
             else:
 
