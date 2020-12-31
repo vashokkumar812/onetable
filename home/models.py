@@ -163,7 +163,9 @@ class List(models.Model):
 
     @property
     def list_fields(self):
-        return ListField.objects.filter(list=self, status='active').order_by('order')
+        return ListField.objects.filter(list=self, status='active').order_by('order') \
+            .select_related('list__app', 'list__created_user') \
+            .select_related('created_user')
 
     def __str__(self):
         return self.name
@@ -218,11 +220,16 @@ class Record(models.Model):
 
     @property
     def record_fields(self):
-        return RecordField.objects.filter(record=self, status='active')
+        return RecordField.objects.filter(record=self, status='active') \
+            .select_related('record__list', 'record__created_user') \
+            .select_related('created_user')
 
     @property
     def primary_field(self):
-        return RecordField.objects.get(record=self, status='active', list_field__primary=True, list_field__status='active')
+        return RecordField.objects.filter(status='active', list_field__primary=True, list_field__status='active') \
+            .select_related('record__list', 'record__created_user') \
+            .select_related('created_user') \
+            .get(record=self)
 
     def __str__(self):
         return self.id
