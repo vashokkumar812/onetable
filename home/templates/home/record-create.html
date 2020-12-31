@@ -1,3 +1,4 @@
+{% load static %}
 <header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
   <div class="container-fluid">
       <div class="page-header-content">
@@ -43,3 +44,46 @@
     </div>
   </div>
 </div>
+
+<!-- Include JS here that does not need template tags -->
+
+<!-- Include JS here that needs template tags -->
+<script>
+
+  (function($) {
+    $('#add-record').on('click', function(e) {
+        e.preventDefault();
+
+        // Get the values from the form
+        var field_values = [];
+        $(".record-field").each(function(){
+         var id = $(this).attr('id').replace("field_","");
+         var val = $(this).val();
+         field = {}
+         field['fieldId'] = id;
+         field['fieldValue'] = val;
+         field_values.push(field);
+        });
+
+        $.ajax({
+          type: "POST",
+          dataType: 'json',
+          url: "{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}",
+            data: {
+                {% if record %}'record_id': {{ record.id }},{% endif %}
+                'field_values': JSON.stringify(field_values),
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+
+                console.log(data)
+
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+</script>

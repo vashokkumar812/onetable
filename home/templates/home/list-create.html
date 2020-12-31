@@ -74,3 +74,75 @@
     </div>
   </div>
 </div>
+
+<!-- Include JS here that does not need template tags -->
+<script src="{% static 'js/list-create.js' %}"></script>
+<!-- Include JS here that needs template tags -->
+<script>
+
+  (function($) {
+    $('#save_list').on('click', function(e) {
+        e.preventDefault();
+
+        let fields = JSON.parse(localStorage.getItem('fields'))
+        let removed = JSON.parse(localStorage.getItem('removed'))
+
+        let list_name = $('#list_name').val()
+
+        $.ajax({
+          type: "POST",
+          dataType: 'json',
+          {% if list_id %}
+          url: "{% url 'update_list' organization_pk=organization.pk app_pk=app.pk list_pk=list_id %}",
+          {% else %}
+          url: "{% url 'save_list' organization_pk=organization.pk app_pk=app.pk %}",
+          {% endif %}
+            data: {
+                'list_name': list_name,
+                'fields': JSON.stringify(fields),
+                'removed': JSON.stringify(removed),
+                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+            },
+            success: function(data) {
+
+                console.log(data)
+
+            },
+            error: function(xhr, status, error) {
+                // shit happens friends!
+            }
+        });
+    });
+  }(jQuery));
+
+  {% if list_id %}
+  // Load the list fields if in list edit mode
+  $( document ).ready(function(){
+    $.ajax({
+        url: "{% url 'list_fields' organization_pk=organization.pk app_pk=app.pk list_pk=list_id %}",
+        type: 'get',
+        dataType: 'json',
+        success: function(data){
+
+            // Update the name of the list
+            $('#list_name').val(data.name)
+
+            // Save fields to local storage
+            $.each(data.fields, function(index, field) {
+              field['editMode'] = false;
+            });
+            localStorage.setItem('fields', JSON.stringify(data.fields))
+
+            // Display the list
+            refreshFieldDisplay()
+
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            var errorMsg = 'Ajax request failed: ' + xhr.responseText;
+            console.log(errorMsg)
+          }
+    });
+  });
+  {% endif %}
+
+</script>
