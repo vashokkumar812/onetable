@@ -40,20 +40,37 @@
     <div class="card-body">
       <form>
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-12">
             <div class="form-group">
               <label for="field-label">Field Label</label>
               <input class="form-control" id="field-label" type="text" placeholder="Field label">
             </div>
           </div>
-          <div class="col-lg-4">
+        </div>
+        <div class="row">
+          <div class="col-lg-6">
             <div class="form-group">
                 <label for="field-type">Field type</label>
-                <select class="form-control" id="field-type" placeholder="Select option">
+                <select class="form-control p-2" id="field-type" placeholder="Select option">
                     <option value="" selected disabled hidden>Select one</option>
                     <option value="text">Text</option>
                     <option value="long-text">Long Text</option>
                     <option value="number">Number</option>
+                    <option value="choose-from-list">Choose from List</option>
+                    <option value="choose-multiple-from-list">Choose multiple from list</option>
+                </select>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="form-group d-none" id="select-list-group">
+                <label for="field-list">List</label>
+                <select class="form-control p-2" id="field-list" placeholder="Select option">
+                    <option value="" selected disabled hidden>Select list</option>
+                    {% if lists %}
+                      {% for list in lists %}
+                        <option value="list_{{ list.id }}">{{ list.name }}</option>
+                      {% endfor %}
+                    {% endif %}
                 </select>
             </div>
           </div>
@@ -121,11 +138,11 @@
     });
   }(jQuery));
 
-  {% if list_id %}
+  {% if list.id %}
   // Load the list fields if in list edit mode
   $( document ).ready(function(){
     $.ajax({
-        url: "{% url 'list_fields' organization_pk=organization.pk app_pk=app.pk list_pk=list_id %}",
+        url: "{% url 'list_fields' organization_pk=organization.pk app_pk=app.pk list_pk=list.id %}",
         type: 'get',
         dataType: 'json',
         success: function(data){

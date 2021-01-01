@@ -8,21 +8,33 @@ localStorage.setItem('fields', JSON.stringify(fields))
 const removed = []
 localStorage.setItem('removed', JSON.stringify(removed))
 
+$('#field-type').change(function() {
+    if ($(this).val() == 'choose-from-list' || $(this).val() == 'choose-multiple-from-list') {
+      // Show the select from list box
+      $('#select-list-group').removeClass('d-none');
+    } else {
+      // Hide the select from list box
+      $('#select-list-group').addClass('d-none');
+    }
+});
+
 function addFieldElement(field) {
 
   // Get new item attrs
   fieldId = field['id'];
   fieldLabel = field['fieldLabel'];
   fieldType = field['fieldType'];
+  fieldList = field['fieldList'];
+  fieldListName = field['fieldListName'];
   required = field['required'];
   visible = field['visible'];
 
   let fieldItem = ''
   if (field['editMode']) {
-    fieldItem = formatFieldEditItem(fieldId, fieldLabel, fieldType, required, visible)
+    fieldItem = formatFieldEditItem(fieldId, fieldLabel, fieldType, fieldList, fieldListName, required, visible)
 
   } else {
-   fieldItem = formatFieldDisplayItem(fieldId, fieldLabel, fieldType, required, visible)
+   fieldItem = formatFieldDisplayItem(fieldId, fieldLabel, fieldType, fieldList, fieldListName, required, visible)
   }
 
   const newElement = document.createElement('div');
@@ -36,6 +48,8 @@ function formatFieldDisplayItem(
   fieldId,
   fieldLabel,
   fieldType,
+  fieldList,
+  fieldListName,
   required,
   visible,
 ) {
@@ -71,6 +85,7 @@ function formatFieldDisplayItem(
             '</div>' +
               '<div class="card-body py-2">' +
                   '<p>Field Type: '+ displayType +'</p>' +
+                  '<p>Choose from list: '+ fieldListName +'</p>' +
                   '<p>Required: '+ displayRequired +'</p>' +
                   '<p>Visible: '+ displayVisible +'</p>' +
               '</div>' +
@@ -78,6 +93,11 @@ function formatFieldDisplayItem(
       '</div>' +
     '</div>' +
   '</div>';
+
+  if (fieldType != 'choose-from-list' && fieldType != 'choose-multiple-from-list') {
+    // Remove the display of list name
+    fieldDisplayItem = fieldDisplayItem.replace('<p>Choose from list: '+ fieldListName +'</p>','')
+  }
 
   return fieldDisplayItem
 
@@ -87,6 +107,8 @@ function formatFieldEditItem(
   fieldId,
   fieldLabel,
   fieldType,
+  fieldList,
+  fieldListName,
   required,
   visible,
 ) {
@@ -165,24 +187,12 @@ function formatFieldEditItem(
     fieldEditItem = fieldEditItem.replace('<option value="number">Number</option>', '<option value="number" selected>Number</option>')
   }
 
-  if (fieldType == 'decimal') {
-    fieldEditItem = fieldEditItem.replace('<option value="decimal">Decimal</option>', '<option value="decimal" selected>Decimal</option>')
+  if (fieldType == 'choose-from-list') {
+    fieldEditItem = fieldEditItem.replace('<option value="choose-from-list">Choose from list</option>', '<option value="choose-from-list" selected>Choose from list</option>')
   }
 
-  if (fieldType == 'select-one-option') {
-    fieldEditItem = fieldEditItem.replace('<option value="select-one-option">Select One Option</option>', '<option value="select-one-option" selected>Select One Option</option>')
-  }
-
-  if (fieldType == 'select-multiple-option') {
-    fieldEditItem = fieldEditItem.replace('<option value="select-multiple-option">Select Multiple Options</option>', '<option value="select-multiple-option" selected>Select Multiple Options</option>')
-  }
-
-  if (fieldType == 'select-one-list') {
-    fieldEditItem = fieldEditItem.replace('<option value="select-one-list">Select One List</option>', '<option value="select-one-list" selected>Select One List</option>')
-  }
-
-  if (fieldType == 'select-multiple-list') {
-    fieldEditItem = fieldEditItem.replace('<option value="select-multiple-list">Select Multiple Lists</option>', '<option value="select-multiple-list" selected>Select Multiple Lists</option>')
+  if (fieldType == 'choose-multiple-from-list') {
+    fieldEditItem = fieldEditItem.replace('<option value="choose-multiple-from-list">Choose multiple from list</option>', '<option value="choose-multiple-from-list" selected>Choose multiple from list</option>')
   }
 
   return fieldEditItem
@@ -195,6 +205,7 @@ function clearInputs() {
   $("#field-type").val("")
   $("#required").prop('checked', false)
   $("#visible").prop('checked', false)
+  $('#select-list-group').addClass('d-none');
 }
 
 function removeElement(elementId) {
@@ -324,20 +335,11 @@ function displayField(fieldType) {
    if (fieldType == "number") {
      displayType = "Number"
    }
-   if (fieldType == "decimal") {
-     displayType = "Decimal"
+   if (fieldType == "choose-from-list") {
+     displayType = "Choose from list"
    }
-   if (fieldType == "select-one-option") {
-     displayType = "Select One Option"
-   }
-   if (fieldType == "select-multiple-option") {
-     displayType = "Select Multiple Options"
-   }
-   if (fieldType == "select-one-list") {
-     displayType = "Select One from List"
-   }
-   if (fieldType == "select-multiple-list") {
-     displayType = "Select Multiple from List"
+   if (fieldType == "choose-multiple-from-list") {
+     displayType = "Choose multiple from list"
    }
    return displayType;
 }
@@ -401,6 +403,22 @@ $(document).on('click','#add-field', function(e){
     field['visible'] = visible;
     field['order'] = null;
     field['editMode'] = false;
+
+    // Check to make sure a list is selected if list type is chosen
+    if (fieldType == 'choose-from-list' || fieldType == 'choose-multiple-from-list') {
+
+      var fieldList = $("#field-list").val().replace("list_","")
+      var fieldListName = $("#field-list").text()
+
+      if (fieldList != null) {
+        field['fieldList'] = fieldList;
+        field['fieldListName'] = fieldListName;
+      } else {
+        // A list needs to be selected
+        alert("Please select a list to choose from!")
+        return;
+      }
+    }
 
     // Add field to the local storage
     let fields = JSON.parse(localStorage.getItem('fields'))
@@ -472,6 +490,22 @@ $(document).on('click','.save-changes', function(e){
 
   // Check to make sure required values are set
   if(fieldLabel && fieldType){
+
+    // Check to make sure a list is selected if list type is chosen
+    if (fieldType == 'choose-from-list' || fieldType == 'choose-multiple-from-list') {
+
+      var fieldList = $("#field-list").val().replace("list_","")
+      var fieldListName = $("#field-list").text()
+
+      if (fieldList != null) {
+        field['fieldList'] = fieldList;
+        field['fieldListName'] = fieldListName;
+      } else {
+        // A list needs to be selected
+        alert("Please select a list to choose from!")
+        return;
+      }
+    }
 
     // Get current fields and field length
     let fields = JSON.parse(localStorage.getItem('fields'))

@@ -489,7 +489,8 @@ def create_list(request, organization_pk, app_pk):
             template_name="home/list-create.html",
             context={
                 'organization': organization,
-                'app': app
+                'app': app,
+                'lists': lists
             }
         )
 
@@ -504,6 +505,7 @@ def create_list(request, organization_pk, app_pk):
         context = {
             'organization': organization,
             'app': app,
+            'lists': lists,
             'type': 'list-create'
         }
 
@@ -515,6 +517,7 @@ def edit_list(request, organization_pk, app_pk, list_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
+    lists = List.objects.all().filter(status='active', app=app)
 
     if request.is_ajax() and request.method == "GET":
 
@@ -525,7 +528,8 @@ def edit_list(request, organization_pk, app_pk, list_pk):
             context={
                 'organization': organization,
                 'app': app,
-                'list': list
+                'list': list,
+                'lists': lists
             }
         )
 
@@ -540,7 +544,8 @@ def edit_list(request, organization_pk, app_pk, list_pk):
         context = {
             'organization': organization,
             'app': app,
-            'list_id': list_pk,
+            'list': list,
+            'lists': lists,
             'type': 'edit-list'
         }
 
@@ -567,6 +572,9 @@ def list_fields(request, organization_pk, app_pk, list_pk):
         field_object['id'] = field.field_id
         field_object['fieldLabel'] = field.field_label
         field_object['fieldType'] = field.field_type
+        if field.select_list:
+            field_object['fieldList'] = field.select_list.id
+            field_object['fieldListName'] = field.select_list.name
         field_object['required'] = field.required
         field_object['primary'] = field.primary
         field_object['visible'] = field.visible
@@ -619,6 +627,13 @@ def save_list(request, organization_pk, app_pk):
                 status='active',
                 created_at=timezone.now(),
                 created_user=request.user)
+
+            # Add the embedded list here if embedded list type
+            if field['fieldType'] == 'choose-from-list' or field['fieldType'] == 'choose-multiple-from-list':
+                # Look up the field list
+                list = get_object_or_404(List, pk=field['fieldList'])
+                list_field.select_list=list
+
             list_field.save();
 
         # Redirect based on ajax call from frontend on success

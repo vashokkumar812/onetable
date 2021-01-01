@@ -175,6 +175,7 @@ class ListField(models.Model):
     field_id = models.CharField(max_length=10)
     field_label = models.TextField()
     field_type = models.CharField(max_length=200)
+    select_list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True, related_name='select_list')
     primary = models.BooleanField()
     required = models.BooleanField()
     visible = models.BooleanField()
