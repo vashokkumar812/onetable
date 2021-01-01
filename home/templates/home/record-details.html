@@ -1,41 +1,18 @@
-<header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
-  <div class="container-fluid">
-      <div class="page-header-content">
-          <div class="row align-items-center justify-content-between pt-3">
-              <div class="col-auto mb-3">
-                  <h1 class="page-header-title">
-                      {{ record.primary_field.value }}
-                  </h1>
-              </div>
-              <div class="col-auto mb-3">
-                  <a href="{% url 'edit_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=record.pk %}">Edit Record</a>
-              </div>
-          </div>
-      </div>
-  </div>
-</header>
-<!-- Main page content-->
-<div class="container mt-4">
-  <!-- Account page navigation-->
-  <nav class="nav nav-borders">
-      <a class="nav-link active ml-0" href="#">Details</a>
-      <a class="nav-link" href="#">Notes</a>
-      <a class="nav-link" href="#">Tasks</a>
-  </nav>
-  <hr class="mt-0 mb-4" />
-  <div class="row">
-      <div class="col-xl-12">
-          <!-- Account details card-->
-          <div class="card mb-4">
-              <div class="card-body">
-                {% if record.record_fields %}
-                  {% for field in record.record_fields %}
-                    {% if field.list_field.primary is False %}
-                      <p>{{ field.list_field.field_label }}: {{ field.value }}</p>
-                    {% endif %}
-                  {% endfor %}
+<div class="col-auto mb-3">
+    <a href="{% url 'edit_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=record.pk %}">Edit Record</a>
+</div>
+<div class="row">
+  <div class="col-xl-12">
+      <!-- Account details card-->
+      <div class="card mb-4">
+          <div class="card-body">
+            {% if record.record_fields %}
+              {% for field in record.record_fields %}
+                {% if field.list_field.primary is False %}
+                  <p>{{ field.list_field.field_label }}: {{ field.value }}</p>
                 {% endif %}
-              </div>
+              {% endfor %}
+            {% endif %}
           </div>
       </div>
   </div>

@@ -894,10 +894,9 @@ def save_record(request, organization_pk, app_pk, list_pk):
     return JsonResponse(data=data_dict, safe=False)
 
 @login_required
-def record_details(request, organization_pk, app_pk, list_pk, record_pk):
+def record(request, organization_pk, app_pk, list_pk, record_pk):
 
     # Record details page (placeholder for now)
-
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
@@ -908,7 +907,7 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
         # Call is ajax, just load main content needed here
 
         html = render_to_string(
-            template_name="home/record-details.html",
+            template_name="home/record.html",
             context={
                 'organization': organization,
                 'app': app,
@@ -930,11 +929,139 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
             'app': app,
             'list': list,
             'record': record,
-            'type': 'record-details'
+            'type': 'record',
+            'record_view': 'record-details'
         }
 
         return render(request, 'home/workspace.html', context=context)
 
+@login_required
+def record_details(request, organization_pk, app_pk, list_pk, record_pk):
+
+    # Record details page (placeholder for now)
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
+    record = get_object_or_404(Record, pk=record_pk)
+
+    if request.is_ajax() and request.method == "GET":
+
+        # Call is ajax, just load main content needed here
+
+        html = render_to_string(
+            template_name="home/record-details.html",
+            context={
+                'organization': organization,
+                'app': app,
+                'list': list,
+                'record': record
+
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    # TODO add access here for direct link
+    # For now just return record details
+    else:
+
+        # If accessing the url directly, load full page
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list': list,
+            'record': record,
+            'type': 'record',
+            'record_view': 'record-details'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
+
+@login_required
+def record_notes(request, organization_pk, app_pk, list_pk, record_pk):
+
+    # Record details page (placeholder for now)
+
+    record = get_object_or_404(Record, pk=record_pk)
+
+    if request.is_ajax() and request.method == "GET":
+
+        # Call is ajax, just load main content needed here
+
+        html = render_to_string(
+            template_name="home/record-notes.html",
+            context={
+                'record': record
+
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    # TODO add access here for direct link
+    # For now just return record details
+    else:
+
+        # If accessing the url directly, load full page
+        organization = get_object_or_404(Organization, pk=organization_pk)
+        app = get_object_or_404(App, pk=app_pk)
+        list = get_object_or_404(List, pk=list_pk)
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list': list,
+            'record': record,
+            'type': 'record',
+            'record_view': 'record-notes'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
+
+@login_required
+def record_tasks(request, organization_pk, app_pk, list_pk, record_pk):
+
+    # Record details page (placeholder for now)
+    record = get_object_or_404(Record, pk=record_pk)
+
+    if request.is_ajax() and request.method == "GET":
+
+        # Call is ajax, just load main content needed here
+
+        html = render_to_string(
+            template_name="home/record-tasks.html",
+            context={
+                'record': record
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        # If accessing the url directly, load full page
+        organization = get_object_or_404(Organization, pk=organization_pk)
+        app = get_object_or_404(App, pk=app_pk)
+        list = get_object_or_404(List, pk=list_pk)
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list': list,
+            'record': record,
+            'type': 'record',
+            'record_view': 'record-tasks'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
 
 @login_required
 def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
