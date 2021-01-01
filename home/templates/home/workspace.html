@@ -60,8 +60,7 @@ class="bg-white"
 {% block extrajs %}
 <script>
 
-  function showDashboard() {
-    const url = "{% url 'dashboard' organization_pk=organization.pk app_pk=app.pk %}";
+  function getPage(url) {
     $.ajax({
         type: "GET",
         url: url,
@@ -80,93 +79,6 @@ class="bg-white"
       window.history.pushState({}, '', url);
     });
   }
-
-  function showTasks() {
-    const url = "{% url 'tasks' organization_pk=organization.pk app_pk=app.pk %}";
-    $.ajax({
-      type: "GET",
-      url: url,
-        data: {
-            'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
-        },
-        success: function(data) {
-            // append html to the posts div
-            $('#main-content').html(data['html_from_view']);
-        },
-        error: function(xhr, status, error) {
-            // shit happens friends!
-        }
-    }).always(() => {
-
-      window.history.pushState({}, '', url);
-    });
-  }
-
-  function showNotes() {
-    const url = "{% url 'notes' organization_pk=organization.pk app_pk=app.pk %}";
-    $.ajax({
-      type: "GET",
-      url: url,
-        data: {
-            'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
-        },
-        success: function(data) {
-            // append html to the posts div
-            $('#main-content').html(data['html_from_view']);
-        },
-        error: function(xhr, status, error) {
-            // shit happens friends!
-        }
-    }).always(() => {
-
-      window.history.pushState({}, '', url);
-    });
-  }
-
-  function showLists() {
-    const url = "{% url 'lists' organization_pk=organization.pk app_pk=app.pk %}";
-    $.ajax({
-      type: "GET",
-      url: url,
-        data: {
-            'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
-        },
-        success: function(data) {
-            // append html to the posts div
-            $('#main-content').html(data['html_from_view']);
-        },
-        error: function(xhr, status, error) {
-            // shit happens friends!
-        }
-    }).always(() => {
-
-      window.history.pushState({}, '', url);
-    });
-  }
-
-  {% if list %}
-  function showRecords() {
-    const url = "{% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}";
-    $.ajax({
-      type: "GET",
-      url: url,
-        data: {
-            'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
-        },
-        success: function(data) {
-            // append html to the posts div
-            $('#main-content').html(data['html_from_view']);
-        },
-        error: function(xhr, status, error) {
-            // shit happens friends!
-        }
-    }).always(() => {
-
-      window.history.pushState({}, '', url);
-
-    });
-  }
-  {% endif %}
 
 </script>
 {% endblock %}

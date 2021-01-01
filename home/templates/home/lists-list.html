@@ -4,7 +4,7 @@
     <div class="col-lg-4 mb-4">
       <div class="card card-header-actions lift lift-sm h-100">
           <div class="card-header bg-white">
-              <a href="{% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}">{{ list.name }}</a>
+              <a href="javascript:void(0);" onclick="getPage('{% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}');">{{ list.name }}</a>
               <div class="dropdown no-caret">
                   <button class="btn btn-transparent-dark btn-icon dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="text-gray-500" data-feather="more-vertical"></i></button>
                   <div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="dropdownMenuButton">

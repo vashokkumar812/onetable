@@ -7,10 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 import json
 from django.core import serializers
+import uuid
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
 from .forms import OrganizationForm, AppForm
-
 
 # TODO
 # On all views, @login_required prevents users not logged in, but need method and
@@ -888,7 +888,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
     # do this, although there may be a way to!)
 
     # Redirect based on ajax call from frontend on success
-    
+
     data_dict = {"success": True}
 
     return JsonResponse(data=data_dict, safe=False)
@@ -1017,3 +1017,17 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
 
 # TODO need view for create note, edit note, archive note, get notes (will use
 # standard django forms for this)
+
+
+
+#===============================================================================
+# Records
+#===============================================================================
+
+# Will be used later for replacing the default django pk / id's in urls
+def generate_random_string(string_length=10):
+    # Not sure this is the best approach, but works okay for now
+
+    random = str(uuid.uuid4()) # Make into string
+    random = random.replace("-","") # Just letters and numbers
+    return random[0:string_length] # Truncate to correct length

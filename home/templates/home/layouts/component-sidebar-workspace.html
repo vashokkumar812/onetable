@@ -6,19 +6,19 @@
                 <!-- Sidenav Menu Heading (Core)-->
                 <div class="sidenav-menu-heading">Activity</div>
                 <!-- Sidenav Accordion (Dashboard)-->
-                <a class="nav-link" id="dashboard" href="javascript:void(0);" onclick="showDashboard();">
+                <a class="nav-link" id="dashboard" href="javascript:void(0);" onclick="getPage('{% url 'dashboard' organization_pk=organization.pk app_pk=app.pk %}');">
                     <div class="nav-link-icon"></div>
                     Dashboard
                 </a>
-                <a class="nav-link" id="tasks" href="javascript:void(0);" onclick="showTasks();">
+                <a class="nav-link" id="tasks" href="javascript:void(0);" onclick="getPage('{% url 'tasks' organization_pk=organization.pk app_pk=app.pk %}');">
                     <div class="nav-link-icon"></div>
                     Tasks
                 </a>
-                <a class="nav-link" id="notes" href="javascript:void(0);" onclick="showNotes();">
+                <a class="nav-link" id="notes" href="javascript:void(0);" onclick="getPage('{% url 'notes' organization_pk=organization.pk app_pk=app.pk %}');">
                     <div class="nav-link-icon"></div>
                     Notes
                 </a>
-                <a class="nav-link" id="lists" href="javascript:void(0);" onclick="showLists();">
+                <a class="nav-link" id="lists" href="javascript:void(0);" onclick="getPage('{% url 'lists' organization_pk=organization.pk app_pk=app.pk %}');">
                     <div class="nav-link-icon"></div>
                     Lists
                 </a>
