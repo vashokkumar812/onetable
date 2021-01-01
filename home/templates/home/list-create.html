@@ -108,7 +108,7 @@
               console.log(data)
 
               if (data.success) {
-                showLists();
+                getPage('{% url 'lists' organization_pk=organization.pk app_pk=app.pk %}');
               } else {
                 alert("There was an error, please try again!")
               }
