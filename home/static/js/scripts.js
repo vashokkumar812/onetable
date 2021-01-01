@@ -1,3 +1,7 @@
+window.onpopstate = function() {
+    location.reload();
+};
+
 /*!
     * Start Bootstrap - SB Admin Pro v1.3.0 (https://shop.startbootstrap.com/product/sb-admin-pro)
     * Copyright 2013-2020 Start Bootstrap
