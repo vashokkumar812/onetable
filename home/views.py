@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 import json
@@ -621,11 +621,10 @@ def save_list(request, organization_pk, app_pk):
                 created_user=request.user)
             list_field.save();
 
-        # TODO redirect on the template to the 'lists' view / url
-        # Using ajax here to save because cannot do a POST request off of a form
-        # (no form on the request page - the list builder is all in jQuery / JS /
-        # local storage )
-        data_dict = {"message": "Success"}
+        # Redirect based on ajax call from frontend on success
+
+        # TODO Need error handling here for fail
+        data_dict = {"success": True}
 
         return JsonResponse(data=data_dict, safe=False)
 
@@ -686,11 +685,10 @@ def update_list(request, organization_pk, app_pk, list_pk):
                 # Do nothing - field already removed somehow
                 pass
 
-        # TODO redirect on the template to the 'lists' view / url
-        # Using ajax here to save because cannot do a POST request off of a form
-        # (no form on the request page - the list builder is all in jQuery / JS /
-        # local storage )
-        data_dict = {"message": "Success"}
+        # Redirect based on ajax call from frontend on success
+
+        # TODO Need error handling here for fail
+        data_dict = {"success": True}
 
         return JsonResponse(data=data_dict, safe=False)
 
@@ -888,7 +886,10 @@ def save_record(request, organization_pk, app_pk, list_pk):
     # Using ajax here to save because cannot do a POST request and get the field values
     # from a dynamically created form (or at least I couldn't figure out how to
     # do this, although there may be a way to!)
-    data_dict = {"message": "Success"}
+
+    # Redirect based on ajax call from frontend on success
+    
+    data_dict = {"success": True}
 
     return JsonResponse(data=data_dict, safe=False)
 

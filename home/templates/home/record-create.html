@@ -76,7 +76,11 @@
             },
             success: function(data) {
 
-                console.log(data)
+              if (data.success) {
+                showRecords()
+              } else {
+                alert("There was an error, please try again!")
+              }
 
             },
             error: function(xhr, status, error) {

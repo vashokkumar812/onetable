@@ -105,7 +105,13 @@
             },
             success: function(data) {
 
-                console.log(data)
+              console.log(data)
+
+              if (data.success) {
+                showLists();
+              } else {
+                alert("There was an error, please try again!")
+              }
 
             },
             error: function(xhr, status, error) {
