@@ -10,7 +10,7 @@
                   </h1>
               </div>
               <div class="col-12 col-xl-auto mb-3">
-                  <button class="btn btn-primary py-2" id="add-record">Save Record</button>
+                  <button class="btn btn-primary py-2" href="javascript:void(0);" onclick="saveRecord();">Save Record</button>
               </div>
           </div>
       </div>
@@ -50,44 +50,40 @@
 <!-- Include JS here that needs template tags -->
 <script>
 
-  (function($) {
-    $('#add-record').on('click', function(e) {
-        e.preventDefault();
-
-        // Get the values from the form
-        var field_values = [];
-        $(".record-field").each(function(){
-         var id = $(this).attr('id').replace("field_","");
-         var val = $(this).val();
-         field = {}
-         field['fieldId'] = id;
-         field['fieldValue'] = val;
-         field_values.push(field);
-        });
-
-        $.ajax({
-          type: "POST",
-          dataType: 'json',
-          url: "{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}",
-            data: {
-                {% if record %}'record_id': {{ record.id }},{% endif %}
-                'field_values': JSON.stringify(field_values),
-                'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
-            },
-            success: function(data) {
-
-              if (data.success) {
-                getPage({% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list_id %})
-              } else {
-                alert("There was an error, please try again!")
-              }
-
-            },
-            error: function(xhr, status, error) {
-                // shit happens friends!
-            }
-        });
+  function saveRecord() {
+    // Get the values from the form
+    var field_values = [];
+    $(".record-field").each(function(){
+     var id = $(this).attr('id').replace("field_","");
+     var val = $(this).val();
+     field = {}
+     field['fieldId'] = id;
+     field['fieldValue'] = val;
+     field_values.push(field);
     });
-  }(jQuery));
+
+    $.ajax({
+      type: "POST",
+      dataType: 'json',
+      url: "{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}",
+        data: {
+            {% if record %}'record_id': {{ record.id }},{% endif %}
+            'field_values': JSON.stringify(field_values),
+            'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+        },
+        success: function(data) {
+
+          if (data.success) {
+            getPage('{% url 'record' organization_pk=organization.pk app_pk=app.pk list_pk=list.id record_pk=record.id %}')
+          } else {
+            alert("There was an error, please try again!")
+          }
+
+        },
+        error: function(xhr, status, error) {
+            // shit happens friends!
+        }
+    });
+  }
 
 </script>
