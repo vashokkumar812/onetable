@@ -47,6 +47,23 @@ For now, the structure is simple --> overtime we should develop standard practic
 
 ### Deployment
 
+(Same as all Django projects)
+
+- Make sure you are in a virtualenv
+- Install everything from requirements.txt using ```pip3 install -r requirements.txt```
+- Make sure you create a local database in your local postgres called 'one-table-local' (see the `core.settings.base.py` settings file)
+- Run ```python3 manage.py makemigrations``` to create database migrations
+- Run ```python3 manage.py migrate``` to create database tables / initial setup
+- Run ```python3 manage.py createsuperuser``` to create an admin user
+- Run ```python3 manage.py runserver``` for start the local server
+- Access locally at http://127.0.0.1:8000/
+
+
+--------------
+
+
+### Deployment
+
 - The app has been configured to be deployed on Heroku
 - Automatic deployments are not configured on Heroku at this time
 - There is a setup for dev and production, using an environment variable 'environment' on Heroku to designate 'production' settings should be used. There may be a better approach for switching between development and production settings (just an initial approach I tried)
