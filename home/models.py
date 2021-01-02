@@ -239,6 +239,7 @@ class RecordField(models.Model):
     record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)
     list_field = models.ForeignKey('ListField', on_delete=models.SET_NULL, null=True)
     value = models.TextField()
+    selected_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='selected_record')
     created_at = models.DateTimeField(auto_now_add=True)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)

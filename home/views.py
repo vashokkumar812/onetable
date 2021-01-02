@@ -12,6 +12,8 @@ import uuid
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
 from .forms import OrganizationForm, AppForm
 
+from django.views import generic
+
 # TODO
 # On all views, @login_required prevents users not logged in, but need method and
 # approach for making sure users are viewing / editing / creating / etc. only in
@@ -471,11 +473,7 @@ def list(request, organization_pk, app_pk, list_pk):
 @login_required
 def create_list(request, organization_pk, app_pk):
 
-    # Note this "form" and associated template is not using standard Djanog forms
-    # Could not figure out a way to make django forms dynamic and flexible enough
-    # to cover all future use cases for OneTable (i.e. multiple select from list field with filters)
-    # So the form to build Lists and ListFields is all jQuery / Html / JS based and
-    # does not use anything from Django forms.
+    # TODO Implement django formset here and replace below
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
@@ -514,10 +512,47 @@ def create_list(request, organization_pk, app_pk):
 @login_required
 def edit_list(request, organization_pk, app_pk, list_pk):
 
+    # TODO Implement django formset here and replace below
+
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
+
+    # We need to get the existing list fields
+    # Keeping as object not django model because easier to manage here / local storage
+    # needs this json format
+    fields = ListField.objects.all().filter(status='active', list=list).order_by('order')
+
+    list_fields = []
+    for field in fields:
+
+        field_object = {}
+        field_object['id'] = field.field_id
+        field_object['fieldLabel'] = field.field_label
+        field_object['fieldType'] = field.field_type
+        if field.select_list:
+            field_object['fieldList'] = field.select_list.id
+            field_object['fieldListName'] = field.select_list.name
+        field_object['required'] = field.required
+        field_object['primary'] = field.primary
+        field_object['visible'] = field.visible
+        field_object['order'] = field.order
+
+        list_fields.append(field_object)
+
+    # We need the available lists for edit mode choose from list dropdowns
+    # Keeping as object not django model because easier to manage here / local storage
+    # needs this json format
     lists = List.objects.all().filter(status='active', app=app)
+
+    app_lists = []
+    for list in lists:
+
+        list_object = {}
+        list_object['id'] = list.id
+        list_object['name'] = list.name
+
+        app_lists.append(list_object)
 
     if request.is_ajax() and request.method == "GET":
 
@@ -529,7 +564,8 @@ def edit_list(request, organization_pk, app_pk, list_pk):
                 'organization': organization,
                 'app': app,
                 'list': list,
-                'lists': lists
+                'app_lists': app_lists,
+                'list_fields': list_fields
             }
         )
 
@@ -545,7 +581,8 @@ def edit_list(request, organization_pk, app_pk, list_pk):
             'organization': organization,
             'app': app,
             'list': list,
-            'lists': lists,
+            'app_lists': app_lists,
+            'list_fields': list_fields,
             'type': 'edit-list'
         }
 
@@ -556,46 +593,9 @@ def edit_list(request, organization_pk, app_pk, list_pk):
 
 
 @login_required
-def list_fields(request, organization_pk, app_pk, list_pk):
-
-    # This is just used for ajax calls, used to load existing fields when editing a list
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    list_fields = ListField.objects.all().filter(status='active', list=list).order_by('order')
-    fields = []
-    for field in list_fields:
-
-        field_object = {}
-        field_object['id'] = field.field_id
-        field_object['fieldLabel'] = field.field_label
-        field_object['fieldType'] = field.field_type
-        if field.select_list:
-            field_object['fieldList'] = field.select_list.id
-            field_object['fieldListName'] = field.select_list.name
-        field_object['required'] = field.required
-        field_object['primary'] = field.primary
-        field_object['visible'] = field.visible
-        field_object['order'] = field.order
-
-        fields.append(field_object)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call must be ajax
-
-        # Get the list details required for editing
-        list_details = {}
-        list_details['name'] = list.name
-        list_details['fields'] = fields
-
-        return JsonResponse(data=list_details, safe=False)
-
-
-@login_required
 def save_list(request, organization_pk, app_pk):
+
+    # TODO Implement django formset here and replace below
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
@@ -645,6 +645,8 @@ def save_list(request, organization_pk, app_pk):
 
 @login_required
 def update_list(request, organization_pk, app_pk, list_pk):
+
+    # TODO Implement django formset here and replace below
 
     # TODO combine with save_list above to consolidate
 
@@ -1159,8 +1161,6 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
 
 # TODO need view for create note, edit note, archive note, get notes (will use
 # standard django forms for this)
-
-
 
 #===============================================================================
 # Records
