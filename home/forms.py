@@ -30,7 +30,6 @@ class ListForm(forms.ModelForm): #(Workspaces)
     class Meta:
         model = List
         fields = ('name',)
-
         widgets = {
             'name': forms.TextInput(attrs={
                 'class':'form-control form-control-solid p-3',
@@ -42,7 +41,7 @@ class ListForm(forms.ModelForm): #(Workspaces)
 ListFieldFormset = modelformset_factory(
     ListField,
     fields = ('field_label', 'field_type', 'required', 'visible' ),
-    extra=1,
+    extra=5,
     can_order=True,
     can_delete=True,
     widgets = {
@@ -53,6 +52,14 @@ ListFieldFormset = modelformset_factory(
         ),
         'field_type': forms.Select(attrs={
             'class': 'form-control form-control-solid p-3'
+            }
+        ),
+        'required': forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+            }
+        ),
+        'visible': forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
             }
         )
     }

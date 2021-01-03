@@ -500,11 +500,16 @@ def create_list(request, organization_pk, app_pk):
             list.save() # Save here then update primary field once field is saved
             # Loop through the list field forms submitted
             for index, form in enumerate(formset):
+
+                print('--------') # Just for testing
+                print(form.cleaned_data) # Just for testing
+
                 # Save the list field
                 list_field = form.save(commit=False)
                 list_field.list = list
                 list_field.created_user = request.user
                 list_field.created_at = timezone.now()
+                
                 if index == 0:
                     list_field.primary = True
                     list_field.required = True
