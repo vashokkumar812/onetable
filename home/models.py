@@ -10,7 +10,7 @@ from django.db.models import JSONField
 class Organization(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
@@ -35,7 +35,7 @@ class Organization(models.Model):
 class OrganizationUser(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     organization = models.ForeignKey('Organization', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
 
     ORGANIZATION_USER_STATUS = (
         ('active', 'Active'),
@@ -65,7 +65,7 @@ class App(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     organization = models.ForeignKey('Organization', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
@@ -91,7 +91,7 @@ class App(models.Model):
 class AppUser(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     app = models.ForeignKey('App', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
 
     PROJECT_USER_STATUS = (
         ('active', 'Active'),
@@ -120,7 +120,7 @@ class AppUser(models.Model):
 class Menu(models.Model):
     name = models.CharField(max_length=200)
     app = models.ForeignKey('App', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
     order = models.IntegerField()
@@ -144,7 +144,7 @@ class Menu(models.Model):
 class List(models.Model):
     name = models.CharField(max_length=200)
     app = models.ForeignKey('App', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
@@ -171,16 +171,29 @@ class List(models.Model):
         return self.name
 
 class ListField(models.Model):
-    list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True)
+    list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True, related_name='list')
     field_id = models.CharField(max_length=10)
     field_label = models.TextField()
-    field_type = models.CharField(max_length=200)
+
+    FIELD_TYPE = (
+        ('text', 'Text'),
+        ('long-text', 'Long Text'),
+        ('number', 'Number'),
+    )
+
+    field_type = models.CharField(
+        max_length=250,
+        choices=FIELD_TYPE,
+        blank=False,
+        default='text',
+    )
+
     select_list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True, related_name='select_list')
-    primary = models.BooleanField()
-    required = models.BooleanField()
-    visible = models.BooleanField()
-    order = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    primary = models.BooleanField(null=False, default=False)
+    required = models.BooleanField(null=False, default=False)
+    visible = models.BooleanField(null=False, default=False)
+    order = models.IntegerField(null=False, default=0)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
@@ -202,7 +215,7 @@ class ListField(models.Model):
 
 class Record(models.Model):
     list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
@@ -236,11 +249,11 @@ class Record(models.Model):
         return self.id
 
 class RecordField(models.Model):
-    record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)
+    record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='record')
     list_field = models.ForeignKey('ListField', on_delete=models.SET_NULL, null=True)
     value = models.TextField()
     selected_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='selected_record')
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 

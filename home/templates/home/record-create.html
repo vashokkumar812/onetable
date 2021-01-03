@@ -74,7 +74,7 @@
         success: function(data) {
 
           if (data.success) {
-            getPage('{% url 'record' organization_pk=organization.pk app_pk=app.pk list_pk=list.id record_pk=record.id %}')
+            // Go to the record page here
           } else {
             alert("There was an error, please try again!")
           }

@@ -10,9 +10,7 @@ from django.core import serializers
 import uuid
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
-from .forms import OrganizationForm, AppForm
-
-from django.views import generic
+from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset
 
 # TODO
 # On all views, @login_required prevents users not logged in, but need method and
@@ -473,41 +471,60 @@ def list(request, organization_pk, app_pk, list_pk):
 @login_required
 def create_list(request, organization_pk, app_pk):
 
-    # TODO Implement django formset here and replace below
-
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     lists = List.objects.all().filter(status='active', app=app)
 
-    if request.is_ajax() and request.method == "GET":
+    # Django formset stuff
 
-        # Call is ajax, just load main content needed here
+    # Use model formset and not inline formset for more control over the data
+    # being saved (i.e. setting and checking primary fields, etc.)
 
-        html = render_to_string(
-            template_name="home/list-create.html",
-            context={
-                'organization': organization,
-                'app': app,
-                'lists': lists
-            }
-        )
+    if request.method == 'GET':
+        listform = ListForm(request.GET or None)
+        formset = ListFieldFormset(queryset=List.objects.none())
 
-        data_dict = {"html_from_view": html}
+    elif request.method == 'POST':
+        listform = ListForm(request.POST)
+        formset = ListFieldFormset(request.POST)
 
-        return JsonResponse(data=data_dict, safe=False)
+        print(request.POST)
 
-    else:
+        # Verify the form submitted is valid
+        if listform.is_valid() and formset.is_valid():
 
-        # If accessing the url directly, load full page
+            list = listform.save(commit=False)
+            list.app = app
+            list.created_user = request.user
+            list.created_at = timezone.now()
+            list.save() # Save here then update primary field once field is saved
+            # Loop through the list field forms submitted
+            for index, form in enumerate(formset):
+                # Save the list field
+                list_field = form.save(commit=False)
+                list_field.list = list
+                list_field.created_user = request.user
+                list_field.created_at = timezone.now()
+                if index == 0:
+                    list_field.primary = True
+                    list_field.required = True
+                    list_field.visible = True
+                list_field.save()
 
-        context = {
-            'organization': organization,
-            'app': app,
-            'lists': lists,
-            'type': 'list-create'
-        }
+            return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
 
-        return render(request, 'home/workspace.html', context=context)
+    context={
+        'organization': organization,
+        'app': app,
+        'lists': lists,
+        'listform': listform,
+        'formset': formset,
+        'type': 'list-create'
+    }
+
+    # TODO eventually handle ajax calls vs. direct link call
+
+    return render(request, 'home/workspace.html', context=context)
 
 @login_required
 def edit_list(request, organization_pk, app_pk, list_pk):
