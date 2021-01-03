@@ -14,7 +14,7 @@
 </header>
 <!-- Main page content-->
 <div class="container">
-  <form class="form-horizontal" method="POST" action="">
+  <form class="form-horizontal" id="form-container" method="POST" action="">
     {% csrf_token %}
     <div class="card card-header-actions form-row mb-3">
       <div class="card-body">
@@ -30,31 +30,36 @@
     <hr>
     {{ formset.management_form }}
     {% for form in formset %}
-    <div class="card card-header-actions form-row mb-3">
+    <div class="card card-header-actions field-form" mb-3">
         <div class="card-body">
           <div class="row mb-3">
             <div class="col-6">
                 <div class="input-group">
-                    {{form.field_label}}
+                    {{ form.field_label }}
+                    {{ form.field_label.errors }}
                 </div>
             </div>
             <div class="col-6">
                 <div class="input-group">
-                    {{form.field_type}}
+                    {{ form.field_type }}
+                    {{ form.field_type.errors }}
                 </div>
             </div>
+            
             <div class="row mt-3">
               <div class="col-6">
                   <div class="form-group form-check ml-3">
                       <div class="row">
                         <div class="col-12">
-                          {{form.required}}
+                          {{ form.required.errors }}
+                          {{ form.required }}
                           <label class="form-check-label" for="id_form-{{ forloop.counter0 }}-required">Required</label>
                         </div>
                       </div>
                       <div class="row">
                         <div class="col-12">
-                          {{form.visible}}
+                          {{ form.visible.errors }}
+                          {{ form.visible }}
                           <label class="form-check-label" for="id_form-{{ forloop.counter0 }}-required">Visible</label>
                         </div>
                       </div>
@@ -70,17 +75,41 @@
         </div>
     </div>
     {% endfor %}
+    <button class="btn btn-success" id="add-form">Add Another Field</button>
     <div class="row mt-3">
       <div class="col-12">
-        <button class="btn btn-success add-form-row">Add Another Field</button>
+
       </div>
     </div>
     <div class="col-4 mt-3">
         <button type="submit" class="btn btn-block btn-primary">Create</button>
     </div>
+
     </form>
 </div>
 
 <!-- Include JS here that does not need template tags -->
 
 <!-- Include JS here that needs template tags -->
+<script>
+        let fieldForm = document.querySelectorAll(".field-form")
+        let container = document.querySelector("#form-container")
+        let addButton = document.querySelector("#add-form")
+        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+
+        let formNum = fieldForm.length-1
+        addButton.addEventListener('click', addForm)
+
+        function addForm(e){
+            e.preventDefault()
+
+            let newForm = fieldForm[0].cloneNode(true)
+            let formRegex = RegExp(`form-(\\d){1}-`,'g')
+
+            formNum++
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+            container.insertBefore(newForm, addButton)
+
+            totalForms.setAttribute('value', `${formNum+1}`)
+        }
+</script>

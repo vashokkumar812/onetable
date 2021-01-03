@@ -94,6 +94,7 @@ def add_organization(request):
             return redirect('apps', organization_pk=organization.pk)
 
     else:
+
         form = OrganizationForm()
 
         return render(request, 'home/organization-form.html', {'form': form})
@@ -473,7 +474,6 @@ def create_list(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
-    lists = List.objects.all().filter(status='active', app=app)
 
     # Django formset stuff
 
@@ -483,6 +483,9 @@ def create_list(request, organization_pk, app_pk):
     if request.method == 'GET':
         listform = ListForm(request.GET or None)
         formset = ListFieldFormset(queryset=List.objects.none())
+        # Reduce the queryset for select_list field to just active lists in current app
+        #for form in formset:
+            #form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
 
     elif request.method == 'POST':
         listform = ListForm(request.POST)
@@ -509,7 +512,7 @@ def create_list(request, organization_pk, app_pk):
                 list_field.list = list
                 list_field.created_user = request.user
                 list_field.created_at = timezone.now()
-                
+
                 if index == 0:
                     list_field.primary = True
                     list_field.required = True
@@ -521,7 +524,6 @@ def create_list(request, organization_pk, app_pk):
     context={
         'organization': organization,
         'app': app,
-        'lists': lists,
         'listform': listform,
         'formset': formset,
         'type': 'list-create'
@@ -534,84 +536,57 @@ def create_list(request, organization_pk, app_pk):
 @login_required
 def edit_list(request, organization_pk, app_pk, list_pk):
 
-    # TODO Implement django formset here and replace below
-
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
 
-    # We need to get the existing list fields
-    # Keeping as object not django model because easier to manage here / local storage
-    # needs this json format
-    fields = ListField.objects.all().filter(status='active', list=list).order_by('order')
+    # Django formset stuff
 
-    list_fields = []
-    for field in fields:
+    # Use model formset and not inline formset for more control over the data
+    # being saved (i.e. setting and checking primary fields, etc.)
 
-        field_object = {}
-        field_object['id'] = field.field_id
-        field_object['fieldLabel'] = field.field_label
-        field_object['fieldType'] = field.field_type
-        if field.select_list:
-            field_object['fieldList'] = field.select_list.id
-            field_object['fieldListName'] = field.select_list.name
-        field_object['required'] = field.required
-        field_object['primary'] = field.primary
-        field_object['visible'] = field.visible
-        field_object['order'] = field.order
+    if request.method == 'GET':
+        listform = ListForm(request.GET or None, instance=list)
+        formset = ListFieldFormset(queryset=ListField.objects.filter(list=list, status='active'))
+        # Reduce the queryset for select_list field to just active lists in current app
+        #for form in formset:
+            #form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
 
-        list_fields.append(field_object)
+    elif request.method == 'POST':
+        listform = ListForm(request.POST, instance=list)
+        formset = ListFieldFormset(request.POST)
 
-    # We need the available lists for edit mode choose from list dropdowns
-    # Keeping as object not django model because easier to manage here / local storage
-    # needs this json format
-    lists = List.objects.all().filter(status='active', app=app)
+        print(request.POST)
 
-    app_lists = []
-    for list in lists:
+        # Verify the form submitted is valid
+        if listform.is_valid() and formset.is_valid():
 
-        list_object = {}
-        list_object['id'] = list.id
-        list_object['name'] = list.name
+            list = listform.save(commit=False)
+            list.updated_at = timezone.now()
+            list.save() # Save here then update primary field once field is saved
+            # Loop through the list field forms submitted
+            for index, form in enumerate(formset):
 
-        app_lists.append(list_object)
+                # Save the list field
+                list_field = form.save()
+                list_field.updated_at = timezone.now()
+                list_field.save()
 
-    if request.is_ajax() and request.method == "GET":
+            return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
 
-        # Call is ajax, just load main content needed here
+    context={
+        'organization': organization,
+        'app': app,
+        'listform': listform,
+        'formset': formset,
+        'type': 'edit-list'
+    }
 
-        html = render_to_string(
-            template_name="home/list-create.html",
-            context={
-                'organization': organization,
-                'app': app,
-                'list': list,
-                'app_lists': app_lists,
-                'list_fields': list_fields
-            }
-        )
+    # TODO eventually handle ajax calls vs. direct link call
 
-        data_dict = {"html_from_view": html}
+    return render(request, 'home/workspace.html', context=context)
 
-        return JsonResponse(data=data_dict, safe=False)
 
-    else:
-
-        # If accessing the url directly, load full page
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'list': list,
-            'app_lists': app_lists,
-            'list_fields': list_fields,
-            'type': 'edit-list'
-        }
-
-        # Note this screen will also call the list_fields view below once loaded
-        # in order to get / render the actual list fields for editing
-
-        return render(request, 'home/workspace.html', context=context)
 
 
 @login_required
