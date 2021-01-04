@@ -47,28 +47,48 @@
 
   // Setup the correct link on initial / url load
 
-  {% if record_view == 'record-details' %}
-    // Activate details link
-    $('#record-details-link').addClass("active ml-0")
-    $('#record-notes-link').removeClass("active ml-0")
-    $('#record-tasks-link').removeClass("active ml-0")
-  {% elif record_view == 'record-notes' %}
-    // Activate notes link
-    $('#record-details-link').removeClass("active ml-0")
-    $('#record-notes-link').addClass("active ml-0")
-    $('#record-tasks-link').removeClass("active ml-0")
-  {% elif record_view == 'record-tasks' %}
-    // Activate tasks link
-    $('#record-details-link').removeClass("active ml-0")
-    $('#record-notes-link').removeClass("active ml-0")
-    $('#record-tasks-link').addClass("active ml-0")
-  {% else %}
-    {# Load default details #}
-    // Activate details link
-    $('#record-details-link').addClass("active ml-0")
-    $('#record-notes-link').removeClass("active ml-0")
-    $('#record-tasks-link').removeClass("active ml-0")
-  {% endif %}
+  const showActiveLink = (record_view) => {
+    if (record_view === 'record-details') {
+      // Activate details link
+      $('#record-details-link').addClass("active ml-0")
+      $('#record-notes-link').removeClass("active ml-0")
+      $('#record-tasks-link').removeClass("active ml-0")
+    } else if (record_view === 'record-notes') {
+      // Activate notes link
+      $('#record-details-link').removeClass("active ml-0")
+      $('#record-notes-link').addClass("active ml-0")
+      $('#record-tasks-link').removeClass("active ml-0")
+    } else if (record_view == 'record-tasks') {
+      // Activate tasks link
+      $('#record-details-link').removeClass("active ml-0")
+      $('#record-notes-link').removeClass("active ml-0")
+      $('#record-tasks-link').addClass("active ml-0")
+    } else {
+      // Load default details
+      // Activate details link
+      $('#record-details-link').addClass("active ml-0")
+      $('#record-notes-link').removeClass("active ml-0")
+      $('#record-tasks-link').removeClass("active ml-0")
+    }
+  }
+
+  $(document).ready(() => {
+
+    const record_view = "{{ record_view | safe }}"
+    showActiveLink(record_view)
+
+    $('#record-details-link').click(() => {
+      showActiveLink('record-details')
+    })
+  
+    $('#record-notes-link').click(() => {
+      showActiveLink('record-notes')
+    })
+  
+    $('#record-tasks-link').click(() => {
+      showActiveLink('record-tasks')
+    })
+  })
 
   function getRecordView(url) {
     $.ajax({
