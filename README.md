@@ -3,7 +3,9 @@
 
 ### Background
 
-This app will help us with the following:
+OneTable is a test project for exploring the Django project. It is a quick way for users to creating organizations and apps where they create forms and add records. This project will help to explore Django's unique ORM and powerful querying mechanism, frontend template languge, user management, and Rest Framework project. 
+
+Developing this app will help us with the following:
 
 1. Test to see if Django ORM / Postgres / etc configuration meets minimum performance needs for managing large datasets and simple interfaces / template rendering. Much of our work involves large, relational datasets and help clients to more quickly store and organize this information outside of spreadsheets like Excel or Google Sheets.
 
@@ -15,14 +17,16 @@ This app will help us with the following:
 
 5. If Django is not suitable for #3, we'll replace entire app backends with Spring, if / once the ideas from #2 are actually proven to be a good idea 
 
-I want to find a framework that is fast, cheap, and flexible to quickly proof concepts with clients. Right now, seems Django may be a good chance for this, and the OneTable concept will test this with an extreme use case (i.e. lots of records with embedded deep linking and export requirements).
+Ultimately, spending some time working with Django will allow us to verify if Django is a framework that is fast, cheap, and flexible to quickly proof concepts with clients. Right now, seems Django may be a good chance for this, and the OneTable concept will test this with an extreme use case (i.e. lots of records with embedded deep linking and export requirements).
+
 
 --------------
 
 
 ### Structure
 
-For now, the structure is simple --> overtime we should develop standard practices for how we manage settings, templates, static files, etc.
+For now, the structure is simple --> over time we should develop standard practices for how we manage settings, templates, static files, etc.
+In all cases at this stage, we should follow Django best practice, since the framework is mature / robust in feature sets, and it would be rare to find a use case for this project where Django has not solved in the past.
 
 #### Core App
 'Core' is the django app for main settings. In 'core', we set the django project settings, root urls, production / dev environment setup, and config for things like wsgi
@@ -30,16 +34,30 @@ For now, the structure is simple --> overtime we should develop standard practic
 #### Home App
 'Home' is a normal django app. This app controls all of the styling (css, js, etc) as well as the template files and urls for the main website. Please note that the website is using SBAdmin template code which was just droppped into the project (no optimization) and just with some light edits to change colors. Longer term we can develop a library of css / js templates to use for clients. For now, using pre-built SBAdmin code is okay.
 
-
---------------
-
-
-### Architecture
-
+#### Other Notes
 - Right now caching is not setup on the app - should probably implement redis at some point soon so we have that ready for other projects
 - Whitenoise is being used for serving static files, which seems like the recommendation
 - Static files used on the website (i.e. images on the homepage) are served from the same intance that hosts the app / as part of django, but S3 is used for user uploads when in production using the django-storages and boto3 libraries. In development, we don't use S3 -- just uploads to django project. I need to move the S3 credentials to environment variables in heroku so these are protected, once I create a new S3 bucket for this site.
 - Have not added sitemaps for anything for SEO yet - not really needed at this time on a web app like OneTable with mostly internal pages.
+
+
+--------------
+
+
+### Models
+
+Currently we have the following models that are core to the app's structure:
+
+**Organization**: Highest level model storing information for the user's parent organization (group, company, team, etc).
+**OrganizationUser**: Users who have access to / been added to an organization
+**App**: A 'workspace' where users can create forms to store lists of objects with different fields
+**AppUser**: Users who have access to / been added to an app
+**List**: Parent object for naming and defining a 'form' to be created and used by a user for entering data
+**ListField**: Definitions for the fields associated with and to be collected for each List
+**Record**: Parent object for storing a List form entry saved by a user
+**RecordField**: Field values associated with each record saved for a List / ListField definition
+
+_Note: right now, the concept of an OrganizationUser / AppUser does not use any of the Django roles and permissions frameworks but can / should in the future_
 
 
 --------------
@@ -65,8 +83,8 @@ For now, the structure is simple --> overtime we should develop standard practic
 ### Deployment
 
 - The app has been configured to be deployed on Heroku
-- Automatic deployments are not configured on Heroku at this time
-- There is a setup for dev and production, using an environment variable 'environment' on Heroku to designate 'production' settings should be used. There may be a better approach for switching between development and production settings (just an initial approach I tried)
+- Automatic deployments are **not** configured on Heroku at this time through a webhook for the master branch
+- There is a setup for dev and production, using an environment variable 'environment' on Heroku to designate 'production' settings should be used. There may be a better approach for switching between development and production settings (this is just an initial approach working for now)
 
 
 
