@@ -92,24 +92,27 @@
 
 <!-- Include JS here that needs template tags -->
 <script>
-        let fieldForm = document.querySelectorAll(".field-form")
-        let container = document.querySelector("#form-container")
-        let addButton = document.querySelector("#add-form")
-        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
 
-        let formNum = fieldForm.length-1
-        addButton.addEventListener('click', addForm)
+  $(document).ready(() => {
 
-        function addForm(e){
-            e.preventDefault()
+    const fieldForm = document.querySelectorAll(".field-form")
+    const container = document.querySelector("#form-container")
+    const addButton = document.querySelector("#add-form")
+    const totalForms = document.querySelector("#id_form-TOTAL_FORMS")
 
-            let newForm = fieldForm[0].cloneNode(true)
-            let formRegex = RegExp(`form-(\\d){1}-`,'g')
+    let formNum = fieldForm.length-1
+    addButton.addEventListener('click', (e) => {
+      e.preventDefault()
 
-            formNum++
-            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
-            container.insertBefore(newForm, addButton)
+      const newForm = fieldForm[0].cloneNode(true)
+      const formRegex = RegExp(`form-(\\d){1}-`,'g')
 
-            totalForms.setAttribute('value', `${formNum+1}`)
-        }
+      formNum++
+      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+      container.insertBefore(newForm, addButton)
+
+      totalForms.setAttribute('value', `${formNum+1}`)
+    })
+
+  })
 </script>
