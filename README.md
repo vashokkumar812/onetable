@@ -3,7 +3,7 @@
 
 ### Background
 
-OneTable is a test project for exploring the Django project. It is a quick way for users to creating organizations and apps where they create forms and add records. This project will help to explore Django's unique ORM and powerful querying mechanism, frontend template languge, user management, and Rest Framework project. 
+OneTable is a test project for exploring the Django framework. It is a quick way for users to creating organizations and apps where they create forms and add records. This project will help to explore Django's unique ORM and powerful querying mechanism, frontend template languge, user management, and Rest Framework project. 
 
 Developing this app will help us with the following:
 
