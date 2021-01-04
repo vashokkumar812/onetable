@@ -62,15 +62,21 @@
      field_values.push(field);
     });
 
+    const data = {
+      'field_values': JSON.stringify(field_values),
+      'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
+    };
+
+    const record = "{{ record | safe }}"
+    if (record) {
+      data.record_id = record.id
+    }
+
     $.ajax({
       type: "POST",
       dataType: 'json',
       url: "{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}",
-        data: {
-            {% if record %}'record_id': {{ record.id }},{% endif %}
-            'field_values': JSON.stringify(field_values),
-            'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
-        },
+        data: data,
         success: function(data) {
 
           if (data.success) {
@@ -83,7 +89,7 @@
         error: function(xhr, status, error) {
             // shit happens friends!
         }
-    });
+    })
   }
 
 </script>
