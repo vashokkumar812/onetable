@@ -48,14 +48,14 @@ In all cases at this stage, we should follow Django best practice, since the fra
 
 Currently we have the following models that are core to the app's structure:
 
-**Organization**: Highest level model storing information for the user's parent organization (group, company, team, etc).
-**OrganizationUser**: Users who have access to / been added to an organization
-**App**: A 'workspace' where users can create forms to store lists of objects with different fields
-**AppUser**: Users who have access to / been added to an app
-**List**: Parent object for naming and defining a 'form' to be created and used by a user for entering data
-**ListField**: Definitions for the fields associated with and to be collected for each List
-**Record**: Parent object for storing a List form entry saved by a user
-**RecordField**: Field values associated with each record saved for a List / ListField definition
+-**Organization**: Highest level model storing information for the user's parent organization (group, company, team, etc).
+-**OrganizationUser**: Users who have access to / been added to an organization
+-**App**: A 'workspace' where users can create forms to store lists of objects with different fields
+-**AppUser**: Users who have access to / been added to an app
+-**List**: Parent object for naming and defining a 'form' to be created and used by a user for entering data
+-**ListField**: Definitions for the fields associated with and to be collected for each List
+-**Record**: Parent object for storing a List form entry saved by a user
+-**RecordField**: Field values associated with each record saved for a List / ListField definition
 
 _Note: right now, the concept of an OrganizationUser / AppUser does not use any of the Django roles and permissions frameworks but can / should in the future_
 
