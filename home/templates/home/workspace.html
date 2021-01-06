@@ -61,11 +61,8 @@ class="bg-white"
 <script>
 
   function getPage(url) {
-<<<<<<< HEAD
     console.log('ajax start');
     console.log(url);
-=======
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
     $.ajax({
         type: "GET",
         url: url,
@@ -73,10 +70,7 @@ class="bg-white"
             'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
         },
         success: function(data) {
-<<<<<<< HEAD
             console.log('success');
-=======
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
             // append html to the posts div
             $('#main-content').html(data['html_from_view']);
         },

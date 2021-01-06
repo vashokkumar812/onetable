@@ -10,11 +10,7 @@ from django.core import serializers
 import uuid
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
-<<<<<<< HEAD
 from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset, modelformset_factory
-=======
-from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 
 # TODO
 # On all views, @login_required prevents users not logged in, but need method and
@@ -320,7 +316,6 @@ def dashboard(request, organization_pk, app_pk):
         }
 
         return render(request, 'home/workspace.html', context=context)
-<<<<<<< HEAD
 
 @login_required
 def tasks(request, organization_pk, app_pk):
@@ -358,45 +353,6 @@ def tasks(request, organization_pk, app_pk):
 
 
 @login_required
-=======
-
-@login_required
-def tasks(request, organization_pk, app_pk):
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/tasks.html",
-            context={
-                'organization': organization,
-                'app': app
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    else:
-
-        # If accessing the url directly, load full page
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'type': 'tasks'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
-
-
-@login_required
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 def notes(request, organization_pk, app_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
@@ -528,29 +484,16 @@ def create_list(request, organization_pk, app_pk):
         listform = ListForm(request.GET or None)
         formset = ListFieldFormset(queryset=List.objects.none())
         # Reduce the queryset for select_list field to just active lists in current app
-<<<<<<< HEAD
         for form in formset:
             form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
             form.fields['select_list'].empty_label = 'Select User'
-=======
-        #for form in formset:
-            #form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 
     elif request.method == 'POST':
         listform = ListForm(request.POST)
         formset = ListFieldFormset(request.POST)
 
-<<<<<<< HEAD
         # Verify the form submitted is valid
         if listform.is_valid() and formset.is_valid():
-=======
-        print(request.POST)
-
-        # Verify the form submitted is valid
-        if listform.is_valid() and formset.is_valid():
-
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
             list = listform.save(commit=False)
             list.app = app
             list.created_user = request.user
@@ -558,13 +501,6 @@ def create_list(request, organization_pk, app_pk):
             list.save() # Save here then update primary field once field is saved
             # Loop through the list field forms submitted
             for index, form in enumerate(formset):
-<<<<<<< HEAD
-=======
-
-                print('--------') # Just for testing
-                print(form.cleaned_data) # Just for testing
-
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
                 # Save the list field
                 list_field = form.save(commit=False)
                 list_field.list = list
@@ -576,7 +512,6 @@ def create_list(request, organization_pk, app_pk):
                     list_field.required = True
                     list_field.visible = True
                 list_field.save()
-<<<<<<< HEAD
                 for select_list_id in request.POST.getlist(f'form-{index}-select_list'):
                     if form.cleaned_data.get('select_list') is not None:
                         if int(select_list_id) != int(form.cleaned_data.get('select_list').id):
@@ -586,11 +521,6 @@ def create_list(request, organization_pk, app_pk):
             return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
         else:
             print(formset.errors)
-=======
-
-            return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
-
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
     context={
         'organization': organization,
         'app': app,
@@ -602,10 +532,6 @@ def create_list(request, organization_pk, app_pk):
     # TODO eventually handle ajax calls vs. direct link call
 
     return render(request, 'home/workspace.html', context=context)
-<<<<<<< HEAD
-
-=======
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 
 @login_required
 def edit_list(request, organization_pk, app_pk, list_pk):
@@ -623,21 +549,12 @@ def edit_list(request, organization_pk, app_pk, list_pk):
         listform = ListForm(request.GET or None, instance=list)
         formset = ListFieldFormset(queryset=ListField.objects.filter(list=list, status='active'))
         # Reduce the queryset for select_list field to just active lists in current app
-<<<<<<< HEAD
         for form in formset:
             form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
 
     elif request.method == 'POST':
         listform = ListForm(request.POST, instance=list)
         formset = ListFieldFormset(data=request.POST)
-=======
-        #for form in formset:
-            #form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
-
-    elif request.method == 'POST':
-        listform = ListForm(request.POST, instance=list)
-        formset = ListFieldFormset(request.POST)
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 
         print(request.POST)
 
@@ -649,7 +566,6 @@ def edit_list(request, organization_pk, app_pk, list_pk):
             list.save() # Save here then update primary field once field is saved
             # Loop through the list field forms submitted
             for index, form in enumerate(formset):
-<<<<<<< HEAD
                 if int(index) != int(request.POST.get('form-INITIAL_FORMS')):
                 # Save the list field
                     list_field = form.save()
@@ -659,15 +575,6 @@ def edit_list(request, organization_pk, app_pk, list_pk):
             return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
         else:
             print(f'List Form Error\t\t\t\t{listform.errors}\nField Type Error\t\t\t\t{formset.errors}')
-=======
-
-                # Save the list field
-                list_field = form.save()
-                list_field.updated_at = timezone.now()
-                list_field.save()
-
-            return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 
     context={
         'organization': organization,
@@ -719,8 +626,6 @@ def save_list(request, organization_pk, app_pk):
                 status='active',
                 created_at=timezone.now(),
                 created_user=request.user)
-<<<<<<< HEAD
-=======
 
             # Add the embedded list here if embedded list type
             if field['fieldType'] == 'choose-from-list' or field['fieldType'] == 'choose-multiple-from-list':
@@ -1231,524 +1136,10 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
         data_dict = {"html_from_view": html}
 
         return JsonResponse(data=data_dict, safe=False)
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
-
-            # Add the embedded list here if embedded list type
-            if field['fieldType'] == 'choose-from-list' or field['fieldType'] == 'choose-multiple-from-list':
-                # Look up the field list
-                list = get_object_or_404(List, pk=field['fieldList'])
-                list_field.select_list=list
-
-            list_field.save();
-
-        # Redirect based on ajax call from frontend on success
-
-        # TODO Need error handling here for fail
-        data_dict = {"success": True}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-@login_required
-def update_list(request, organization_pk, app_pk, list_pk):
-
-    # TODO Implement django formset here and replace below
-
-    # TODO combine with save_list above to consolidate
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    if request.is_ajax and request.method == "POST":
-
-        list_name = request.POST.get('list_name', None)
-        if list_name is not list.name:
-            list.name=list_name
-            list.last_updated = timezone.now()
-            list.save();
-
-        field_list = json.loads(request.POST['fields'])
-        removed_fields = json.loads(request.POST['removed'])
-
-        # Loop through and update or add the fields
-        for field in field_list:
-            try:
-                list_field = ListField.objects.get(status='active', field_id=field['id'], list=list)
-                # Update the old list field database record
-                list_field.field_label = field['fieldLabel']
-                list_field.fieldType = field['fieldType']
-                list_field.required = field['required']
-                list_field.visible = field['visible']
-                list_field.primary = field['primary']
-                list_field.order = field['order']
-                list_field.save()
-            except ListField.DoesNotExist:
-                # Create a new list field in the database
-                list_field = ListField.objects.create(
-                    list=list,
-                    field_id=field['id'],
-                    field_label=field['fieldLabel'],
-                    field_type=field['fieldType'],
-                    required=field['required'],
-                    visible=field['visible'],
-                    primary=field['primary'],
-                    order=field['order'],
-                    status='active',
-                    created_at=timezone.now(),
-                    created_user=request.user)
-                list_field.save();
-
-        for field_id in removed_fields:
-            try:
-                list_field = ListField.objects.get(status='active', field_id=field_id, list=list)
-                list_field.status = "deleted"
-                list_field.save()
-            except ListField.DoesNotExist:
-                # Do nothing - field already removed somehow
-                pass
-
-        # Redirect based on ajax call from frontend on success
-
-        # TODO Need error handling here for fail
-        data_dict = {"success": True}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-@login_required
-def archive_list(request, organization_pk, app_pk, list_pk):
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    list.status = "archived"
-    list.save()
-
-    # Able to use a redirect here because we did a direct POST request
-    return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
-
-@login_required
-def list_settings(request, organization_pk, app_pk, list_pk):
-
-    # Does not / will not use the standard django forms per the comments noted
-    # above
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    context = {
-        'organization': organization,
-        'app': app,
-        'list': list
-    }
-
-    return render(request, 'home/list-settings.html', context=context)
-
-
-#===============================================================================
-# Records
-#===============================================================================
-
-@login_required
-def add_record(request, organization_pk, app_pk, list_pk):
-
-    # Very similar to the edit_record view, but includes the field values previously saved
-    # Probably a way to combine these views to consolidate
-
-    # We are not using the following here:
-    # 1) Django form.Forms (couldn't find a way to create dynamic forms this approach,
-    # but we may be able to find eventually)
-    # 2) the models.Model @property for list.list_fields or the record.record_fields >>
-    # needed an object with both the field inforation and value included so we can edit prvious values here
-
-    # Instead, only approach could find is building an object here then passing it to the frontend
-    # template for rending the form
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    fields = []
-    for list_field in list.list_fields:
-
-        field_object = {}
-        field_object['field_id'] = list_field.field_id
-        field_object['field_label'] = list_field.field_label
-        field_object['field_type'] = list_field.field_type
-        field_object['required'] = list_field.required
-        field_object['primary'] = list_field.primary
-        field_object['visible'] = list_field.visible
-        field_object['order'] = list_field.order
-
-        fields.append(field_object)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/record-create.html",
-            context={
-                'organization': organization,
-                'app': app,
-                'list': list,
-                'fields': fields
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
 
     else:
 
         # If accessing the url directly, load full page
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'list': list,
-            'fields': fields,
-            'type': 'edit-record'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
-
-@login_required
-def save_record(request, organization_pk, app_pk, list_pk):
-
-    # This handles both saving and updating a record
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    record_id = request.POST.get('record_id', None)
-    fields = json.loads(request.POST['field_values'])
-
-    # TODO
-    # Needs error handling here verify if the form is valid (i.e. all required fields, acceptable data types, etc)
-
-    record = None # Create object globally outside of the if/else
-    if record_id is not None:
-        # Get the existing record / this is a record being edited
-        record = get_object_or_404(Record, pk=record_id)
-    else:
-        # Add a new record
-        record = Record.objects.create(
-            list=list,
-            status='active',
-            created_at=timezone.now(),
-            last_updated=timezone.now(),
-            created_user=request.user)
-        record.save();
-
-    for field in fields:
-
-            # Print for testing / temporary
-            print('---------------')
-            print(field['fieldId'])
-            print(field['fieldValue'])
-
-            if field['fieldValue'] is not None:
-                # Only save a RecordField object if there is a value
-
-                if record_id is not None:
-
-                    try:
-                        # Update existing record field
-                        record_field = RecordField.objects.get(status='active', list_field__field_id=field['fieldId'], record=record)
-                        record_field.value = field['fieldValue']
-                        record_field.last_updated = timezone.now()
-                        record_field.save()
-
-                    except RecordField.DoesNotExist:
-
-                        # This record field has not been saved before, so create it
-                        # Note this is redundant with below / can be consolidated eventually
-                        try:
-
-                            list_field = ListField.objects.get(status='active', field_id=field['fieldId'], list=list)
-
-                            record_field = RecordField.objects.create(
-                                record=record,
-                                list_field=list_field,
-                                value=field['fieldValue'],
-                                status='active',
-                                created_at=timezone.now(),
-                                created_user=request.user)
-                            record_field.save()
-
-                        except ListField.DoesNotExist:
-                            # Easy error handling for now
-                            pass
-
-                else:
-
-                    try:
-
-                        # Create new record field
-
-                        list_field = ListField.objects.get(status='active', field_id=field['fieldId'], list=list)
-
-                        record_field = RecordField.objects.create(
-                            record=record,
-                            list_field=list_field,
-                            value=field['fieldValue'],
-                            status='active',
-                            created_at=timezone.now(),
-                            created_user=request.user)
-                        record_field.save()
-
-                    except ListField.DoesNotExist:
-                        # Easy error handling for now
-                        pass
-
-    # Using ajax here to save because cannot do a POST request and get the field values
-    # from a dynamically created form (or at least I couldn't figure out how to
-    # do this, although there may be a way to!)
-
-    # Redirect based on ajax call from frontend on success
-
-    data_dict = {"success": True}
-
-    return JsonResponse(data=data_dict, safe=False)
-
-@login_required
-def record(request, organization_pk, app_pk, list_pk, record_pk):
-
-    # Record details page (placeholder for now)
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-    record = get_object_or_404(Record, pk=record_pk)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/record.html",
-            context={
-                'organization': organization,
-                'app': app,
-                'list': list,
-                'record': record
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    else:
-
-        # If accessing the url directly, load full page
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'list': list,
-            'record': record,
-            'type': 'record',
-            'record_view': 'record-details'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
-
-@login_required
-def record_details(request, organization_pk, app_pk, list_pk, record_pk):
-
-    # Record details page (placeholder for now)
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-    record = get_object_or_404(Record, pk=record_pk)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/record-details.html",
-            context={
-                'organization': organization,
-                'app': app,
-                'list': list,
-                'record': record
-
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    # TODO add access here for direct link
-    # For now just return record details
-    else:
-
-        # If accessing the url directly, load full page
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'list': list,
-            'record': record,
-            'type': 'record',
-            'record_view': 'record-details'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
-
-@login_required
-def record_notes(request, organization_pk, app_pk, list_pk, record_pk):
-
-    # Record details page (placeholder for now)
-
-    record = get_object_or_404(Record, pk=record_pk)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/record-notes.html",
-            context={
-                'record': record
-
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    # TODO add access here for direct link
-    # For now just return record details
-    else:
-
-        # If accessing the url directly, load full page
-<<<<<<< HEAD
-        organization = get_object_or_404(Organization, pk=organization_pk)
-        app = get_object_or_404(App, pk=app_pk)
-        list = get_object_or_404(List, pk=list_pk)
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'list': list,
-            'record': record,
-            'type': 'record',
-            'record_view': 'record-notes'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
-
-@login_required
-def record_tasks(request, organization_pk, app_pk, list_pk, record_pk):
-
-    # Record details page (placeholder for now)
-    record = get_object_or_404(Record, pk=record_pk)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/record-tasks.html",
-            context={
-                'record': record
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    else:
-
-        # If accessing the url directly, load full page
-        organization = get_object_or_404(Organization, pk=organization_pk)
-        app = get_object_or_404(App, pk=app_pk)
-        list = get_object_or_404(List, pk=list_pk)
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'list': list,
-            'record': record,
-            'type': 'record',
-            'record_view': 'record-tasks'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
-
-@login_required
-def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-    record = get_object_or_404(Record, pk=record_pk)
-
-    # Very similar to the add_record view, but includes the field values previously saved
-    # Probably a way to combine these views to consolidate
-
-    # We are not using the following here:
-    # 1) Django form.Forms (couldn't find a way to create dynamic forms this approach,
-    # but we may be able to find eventually)
-    # 2) the models.Model @property for list.list_fields or the record.record_fields >>
-    # needed an object with both the field inforation and value included so we can edit prvious values here
-
-    # Instead, only approach could find is building an object here then passing it to the frontend
-    # template for rending the form
-
-    fields = []
-    for list_field in list.list_fields:
-
-        field_object = {}
-        field_object['field_id'] = list_field.field_id
-        field_object['field_label'] = list_field.field_label
-        field_object['field_type'] = list_field.field_type
-        field_object['required'] = list_field.required
-        field_object['primary'] = list_field.primary
-        field_object['visible'] = list_field.visible
-        field_object['order'] = list_field.order
-
-        # Get the field value if it exists
-        for record_field in record.record_fields:
-            if list_field.id == record_field.list_field.id:
-                field_object['value'] = record_field.value
-
-        fields.append(field_object)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/record-create.html",
-            context={
-                'organization': organization,
-                'app': app,
-                'list': list,
-                'fields': fields,
-                'record': record
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    else:
-
-        # If accessing the url directly, load full page
-=======
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 
         context = {
             'organization': organization,

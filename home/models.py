@@ -179,11 +179,8 @@ class ListField(models.Model):
         ('text', 'Text'),
         ('long-text', 'Long Text'),
         ('number', 'Number'),
-<<<<<<< HEAD
         ('choose-from-list', 'Choose from List'), 
         ('choose-multiple-from-list', 'Choose multiple from List'),
-=======
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
     )
 
     field_type = models.CharField(
@@ -193,11 +190,7 @@ class ListField(models.Model):
         default='text',
     )
 
-<<<<<<< HEAD
     select_list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True, related_name='select_list', blank=True)
-=======
-    select_list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True, related_name='select_list')
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
     primary = models.BooleanField(null=False, default=False)
     required = models.BooleanField(null=False, default=False)
     visible = models.BooleanField(null=False, default=False)
@@ -220,12 +213,8 @@ class ListField(models.Model):
     )
 
     def __str__(self):
-<<<<<<< HEAD
         return self.field_label
 
-=======
-        return self.name
->>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
 
 class Record(models.Model):
     list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True)
