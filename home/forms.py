@@ -47,16 +47,16 @@ ListFieldFormset = modelformset_factory(
     can_delete=True,
     widgets = {
         'field_label': forms.TextInput(attrs={
-            'class': 'form-control form-control-solid p-3',
+            'class': 'form-control form-control-solid py-1',
             'placeholder': 'Enter a label for this field'
             }
         ),
         'field_type': forms.Select(attrs={
-            'class': 'form-control form-control-solid p-3 field-type-custom'
+            'class': 'form-control form-control-solid py-1 field-type-custom'
             }
         ),
         'select_list': forms.Select(attrs={
-            'class': 'form-control form-control-solid p-3 select-type-custom',
+            'class': 'form-control form-control-solid py-1 select-type-custom',
             'style': 'display:none;'
             }
         ),

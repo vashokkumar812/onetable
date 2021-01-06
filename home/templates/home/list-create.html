@@ -35,7 +35,7 @@
     {{ formset.management_form }}
     {% for form in formset %}
     {{ form.id }}
-    <div class="card card-header-actions field-form" mb-3">
+    <div class="card card-header-actions field-form mb-3">
         <div class="card-body">
           <div class="row mb-3">
             <div class="col-6">
@@ -50,7 +50,7 @@
                     {{ form.field_type.errors }}
                 </div>
             </div>
-            
+
             <div class="col-6 mt-3">
               <div class="input-group">
                 {{ form.select_list }}

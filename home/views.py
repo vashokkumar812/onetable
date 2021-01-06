@@ -512,6 +512,7 @@ def create_list(request, organization_pk, app_pk):
                     list_field.required = True
                     list_field.visible = True
                 list_field.save()
+
                 for select_list_id in request.POST.getlist(f'form-{index}-select_list'):
                     if form.cleaned_data.get('select_list') is not None:
                         if int(select_list_id) != int(form.cleaned_data.get('select_list').id):
