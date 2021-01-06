@@ -1,0 +1,170 @@
+{% load static %}
+<header class="page-header page-header-light page-header-light border-bottom bg-white mb-4">
+  <div class="container">
+      <div class="page-header-content pt-4">
+          <div class="row align-items-center justify-content-between">
+              <div class="col-auto mt-4">
+                <h1 class="page-header-title">
+                  {% if type == "list-create" %}
+                  Create a list
+                  {% elif type == "edit-list" %}
+                  Modify a list
+                  {% endif %}
+                </h1>
+              </div>
+          </div>
+      </div>
+  </div>
+</header>
+<!-- Main page content-->
+<div class="container">
+  <form class="form-horizontal" id="form-container" method="POST" action="">
+    {% csrf_token %}
+    <div class="card card-header-actions form-row mb-3">
+      <div class="card-body">
+        <div class="row mb-3 mt-3">
+          <div class="col-12">
+              <div class="input-group">
+                  {{listform.name}}
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    {{ formset.management_form }}
+    {% for form in formset %}
+    {{ form.id }}
+    <div class="card card-header-actions field-form" mb-3">
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-6">
+                <div class="input-group">
+                    {{ form.field_label }}
+                    {{ form.field_label.errors }}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="input-group">
+                    {{ form.field_type }}
+                    {{ form.field_type.errors }}
+                </div>
+            </div>
+            
+            <div class="col-6 mt-3">
+              <div class="input-group">
+                {{ form.select_list }}
+                {{ form.select_list.errors }}
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-6">
+                  <div class="form-group form-check ml-3">
+                      <div class="row">
+                        <div class="col-12">
+                          {{ form.required.errors }}
+                          {{ form.required }}
+                          <label class="form-check-label" for="id_form-{{ forloop.counter0 }}-required">Required</label>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          {{ form.visible.errors }}
+                          {{ form.visible }}
+                          <label class="form-check-label" for="id_form-{{ forloop.counter0 }}-required">Visible</label>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group form-check">
+
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+    <button class="btn btn-success" id="add-form">Add Another Field</button>
+    <div class="row mt-3">
+      <div class="col-12">
+
+      </div>
+    </div>
+    <div class="col-4 mt-3">
+        <button type="submit" class="btn btn-block btn-primary">
+          {% if type == "list-create" %}
+            Create
+          {% elif type == "edit-list" %}
+            Update
+          {% endif %}
+        </button>
+    </div>
+    </form>
+</div>
+<!-- Include JS here that does not need template tags -->
+
+<!-- Include JS here that needs template tags -->
+<script>
+  $(document).ready(() => {
+    const fieldForm = document.querySelectorAll(".field-form");
+    const container = document.querySelector("#form-container");
+    const addButton = document.querySelector("#add-form");
+    const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
+
+    let formNum = fieldForm.length-1;
+    addButton.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const newForm = fieldForm[0].cloneNode(true);
+      const formRegex = RegExp(`form-(\\d){1}-`,'g');
+      formNum++;
+      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`);
+      container.insertBefore(newForm, addButton);
+      totalForms.setAttribute('value', `${formNum+1}`);
+    });
+  });
+
+  /* Code 05-01-2021*/
+  /* this code is execute when user choose the field type */
+  $(document).on('click', '.field-type-custom', function(){
+    var field_type = $(this).val();
+    if (field_type == "choose-from-list" || field_type == "choose-multiple-from-list")
+    {
+      if (field_type == "choose-from-list")
+      {
+        $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().removeAttr('multiple', false);
+      }
+      else if (field_type == "choose-multiple-from-list")
+      {
+        $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().attr('multiple', true);
+      }
+    }
+    else
+    {
+      $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').hide();
+    }
+  });
+
+  /**/
+  $(document).ready(function(){
+    var field_type_object = $('.field-type-custom');
+    field_type_object.each(function(index, data){
+      console.log($(this).val());
+      if ($(this).val() == "choose-from-list")
+      {
+        $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().removeAttr('multiple', false);
+      }
+      else if ($(this).val() == "choose-multiple-from-list")
+      {
+        $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().attr('multiple', true);
+      }
+    });
+    {% if type == "edit-list" %}
+    var initial_form = $('#id_form-INITIAL_FORMS').val();
+    $('#id_form-'+initial_form+'-id').next('div').hide();
+    {% endif %}
+  });
+</script>

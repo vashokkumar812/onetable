@@ -4,11 +4,11 @@
           <div class="row align-items-center justify-content-between">
               <div class="col-auto mt-4">
                   <h1 class="page-header-title">
-                    Lists
+                    Records for {{ list.name }}
                   </h1>
               </div>
               <div class="col-12 col-xl-auto mb-3">
-                <div class="page-header-subtitle"><a href="{% url 'create_list' organization_pk=organization.pk app_pk=app.pk %}">Add new list</a></div>
+                <div class="page-header-subtitle"><a href="{% url 'add_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}">Add new record</a></div>
               </div>
           </div>
       </div>
@@ -17,7 +17,7 @@
 <!-- Main page content-->
 <div class="container bg-white mt-n10">
 <!-- Main page content-->
-  <div id="lists-list">
-    {% include "home/lists-list.html" %}
+  <div id="records-list">
+    {% include "home/records-list.html" %}
   </div>
 </div>
