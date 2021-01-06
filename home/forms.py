@@ -19,8 +19,34 @@ class AppForm(forms.ModelForm): #(Workspaces)
     class Meta:
         model = App
         fields = ('name','description',)
+<<<<<<< HEAD
 
         widgets = {
+            'name': forms.TextInput(attrs={'class':'form-control form-control-solid'}),
+            'description': forms.TextInput(attrs={'class':'form-control form-control-solid'})
+        }
+=======
+>>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
+
+class ListForm(forms.ModelForm): #(Workspaces)
+
+    class Meta:
+        model = List
+        fields = ('name',)
+        widgets = {
+<<<<<<< HEAD
+            'name': forms.TextInput(attrs={
+                'class':'form-control form-control-solid p-3',
+                'placeholder': 'Enter a name for this list'
+                }
+            )
+        }
+
+
+ListFieldFormset = modelformset_factory(
+    ListField,
+    fields = ('field_label', 'field_type', 'required', 'visible', 'select_list'),
+=======
             'name': forms.TextInput(attrs={'class':'form-control form-control-solid'}),
             'description': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }
@@ -38,10 +64,10 @@ class ListForm(forms.ModelForm): #(Workspaces)
             )
         }
 
-
 ListFieldFormset = modelformset_factory(
     ListField,
-    fields = ('field_label', 'field_type', 'required', 'visible', 'select_list'),
+    fields = ('field_label', 'field_type', 'required', 'visible', ),
+>>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
     extra=1,
     can_order=True,
     can_delete=True,
@@ -52,6 +78,7 @@ ListFieldFormset = modelformset_factory(
             }
         ),
         'field_type': forms.Select(attrs={
+<<<<<<< HEAD
             'class': 'form-control form-control-solid p-3 field-type-custom'
             }
         ),
@@ -60,6 +87,15 @@ ListFieldFormset = modelformset_factory(
             'style': 'display:none;'
             }
         ),
+=======
+            'class': 'form-control form-control-solid p-3'
+            }
+        ),
+        #'select_list': forms.Select(attrs={
+            #'class': 'form-control form-control-solid p-3'
+            #}
+        #),
+>>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
         'required': forms.CheckboxInput(attrs={
             'class': 'form-check-input'
             }

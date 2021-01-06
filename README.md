@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OneTable Django Test App
 
 
@@ -95,3 +96,6 @@ _Note: right now, the concept of an OrganizationUser / AppUser does not use any 
 
 
 
+=======
+# OneTable
+>>>>>>> dce99c064d39f8bb3cef7cc2f0b5b939e2df7b82
