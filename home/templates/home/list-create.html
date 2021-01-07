@@ -36,6 +36,7 @@
     {% for form in formset %}
     {{ form.id }}
     <div class="card card-header-actions field-form mb-3">
+      <a class="text-right pt-3 pr-3 text-danger remove-list-field" href="javascript:void(0);" style="text-decoration: none;" {% if type == "edit-list" %}data-attr="{{form.id.value}}"{% endif %}>X</a>
         <div class="card-body">
           <div class="row mb-3">
             <div class="col-6">
@@ -113,14 +114,22 @@
     const container = document.querySelector("#form-container");
     const addButton = document.querySelector("#add-form");
     const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
+    console.log('=========================', fieldForm.length);
+    console.log(fieldForm);
 
-    let formNum = fieldForm.length-1;
     addButton.addEventListener('click', (e) => {
       e.preventDefault();
-
+      let formNum = fieldForm.length-1;      
+      {% if type == "edit-list" %}
+      const display_form_id = fieldForm.length-1;
+      $('#id_form-'+String(display_form_id)+'-id').next('div').removeAttr('style').removeClass('d-none');
+      const newForm = fieldForm[fieldForm.length-1].cloneNode(true);
+      $('#id_form-'+String(display_form_id)+'-id').next('div').addClass('d-none');
+      {% elif type == "list-create" %}
       const newForm = fieldForm[0].cloneNode(true);
-      const formRegex = RegExp(`form-(\\d){1}-`,'g');
+      {% endif %}
       formNum++;
+      const formRegex = RegExp(`form-(\\d){1}-`,'g');
       newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`);
       container.insertBefore(newForm, addButton);
       totalForms.setAttribute('value', `${formNum+1}`);
@@ -129,7 +138,7 @@
 
   /* Code 05-01-2021*/
   /* this code is execute when user choose the field type */
-  $(document).on('click', '.field-type-custom', function(){
+  $(document).on('change', '.field-type-custom', function(){
     var field_type = $(this).val();
     if (field_type == "choose-from-list" || field_type == "choose-multiple-from-list")
     {
@@ -152,7 +161,6 @@
   $(document).ready(function(){
     var field_type_object = $('.field-type-custom');
     field_type_object.each(function(index, data){
-      console.log($(this).val());
       if ($(this).val() == "choose-from-list")
       {
         $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().removeAttr('multiple', false);
@@ -165,6 +173,28 @@
     {% if type == "edit-list" %}
     var initial_form = $('#id_form-INITIAL_FORMS').val();
     $('#id_form-'+initial_form+'-id').next('div').hide();
+    $('#id_form-'+initial_form+'-id').remove('div');
     {% endif %}
+  });
+
+  /* Code 07-01-2021 */
+  /* code for remove the list field */
+  $(document).on('click', '.remove-list-field', function(){
+    {% if type == "edit-list" %}
+    var initial_form_id = $(this).attr('data-attr');
+    if (initial_form_id !== "None")
+    {
+      var list_field_id = $(this).parent('div').prev('input').val();
+      $('#form-container').append(
+        '<input type="hidden" name="delete_list_field_ids" value='+list_field_id+'>'
+      );
+      // var initial_form_value = $('#id_form-INITIAL_FORMS').val();
+      // $('#id_form-INITIAL_FORMS').val(Number(initial_form_value)-1);
+      // $(this).parent().prev('input').remove();
+    };
+    {% endif %}
+    const totalForms = $("#id_form-TOTAL_FORMS").val();
+    $("#id_form-TOTAL_FORMS").val(Number(totalForms)-1);
+    $(this).parent().hide();
   });
 </script>

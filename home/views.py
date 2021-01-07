@@ -486,7 +486,7 @@ def create_list(request, organization_pk, app_pk):
         # Reduce the queryset for select_list field to just active lists in current app
         for form in formset:
             form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
-            form.fields['select_list'].empty_label = 'Select User'
+            # form.fields['select_list'].empty_label = ''
 
     elif request.method == 'POST':
         listform = ListForm(request.POST)
@@ -572,7 +572,17 @@ def edit_list(request, organization_pk, app_pk, list_pk):
                     list_field = form.save()
                     list_field.list = list
                     list_field.updated_at = timezone.now()
+                    list_field.created_user = request.user
                     list_field.save()
+            
+            remove_list_field_ids = request.POST.getlist('delete_list_field_ids')
+            for list_field_id in remove_list_field_ids:
+                try:
+                    list_field_object = ListField.objects.get(id=int(list_field_id))
+                    list_field_object.status = "deleted"
+                    list_field_object.last_updated = timezone.now()
+                    list_field_object.save()
+                except: pass
             return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
         else:
             print(f'List Form Error\t\t\t\t{listform.errors}\nField Type Error\t\t\t\t{formset.errors}')
