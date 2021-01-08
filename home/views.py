@@ -8,6 +8,8 @@ from django.utils import timezone
 import json
 from django.core import serializers
 import uuid
+import random
+import string
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
 from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset, modelformset_factory
@@ -503,6 +505,7 @@ def create_list(request, organization_pk, app_pk):
             for index, form in enumerate(formset):
                 # Save the list field
                 list_field = form.save(commit=False)
+                list_field.field_id = randStr(N=10)
                 list_field.list = list
                 list_field.created_user = request.user
                 list_field.created_at = timezone.now()
@@ -1183,3 +1186,6 @@ def generate_random_string(string_length=10):
     random = str(uuid.uuid4()) # Make into string
     random = random.replace("-","") # Just letters and numbers
     return random[0:string_length] # Truncate to correct length
+
+def randStr(chars = string.ascii_uppercase + string.digits, N=10):
+	return ''.join(random.choice(chars) for _ in range(N))
