@@ -110,6 +110,7 @@
 <!-- Include JS here that needs template tags -->
 <script>
   $(document).ready(() => {
+
     const fieldForm = document.querySelectorAll(".field-form");
     const container = document.querySelector("#form-container");
     const addButton = document.querySelector("#add-form");
@@ -118,16 +119,28 @@
     console.log(fieldForm);
 
     addButton.addEventListener('click', (e) => {
+
       e.preventDefault();
-      let formNum = fieldForm.length-1;      
-      {% if type == "edit-list" %}
-      const display_form_id = fieldForm.length-1;
-      $('#id_form-'+String(display_form_id)+'-id').next('div').removeAttr('style').removeClass('d-none');
-      const newForm = fieldForm[fieldForm.length-1].cloneNode(true);
-      $('#id_form-'+String(display_form_id)+'-id').next('div').addClass('d-none');
-      {% elif type == "list-create" %}
-      const newForm = fieldForm[0].cloneNode(true);
-      {% endif %}
+
+      let formNum = fieldForm.length-1;
+      let newForm = fieldForm[0].cloneNode(true);
+
+      const type = "{{ type | safe }}";
+      if (type == "edit-list") {
+
+        const display_form_id = fieldForm.length-1;
+        $('#id_form-'+String(display_form_id)+'-id').next('div').removeAttr('style').removeClass('d-none');
+        newForm = fieldForm[fieldForm.length-1].cloneNode(true);
+        $('#id_form-'+String(display_form_id)+'-id').next('div').addClass('d-none');
+      } else if (type == "list-create") {
+
+        newForm = fieldForm[0].cloneNode(true);
+      } else {
+
+        console.warn("You missed passing a composing mode (create or edit)");
+        newForm = fieldForm[0].cloneNode(true);
+      }
+
       formNum++;
       const formRegex = RegExp(`form-(\\d){1}-`,'g');
       newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`);
@@ -138,63 +151,70 @@
 
   /* Code 05-01-2021*/
   /* this code is execute when user choose the field type */
-  $(document).on('change', '.field-type-custom', function(){
-    var field_type = $(this).val();
-    if (field_type == "choose-from-list" || field_type == "choose-multiple-from-list")
-    {
-      if (field_type == "choose-from-list")
-      {
-        $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().removeAttr('multiple', false);
-      }
-      else if (field_type == "choose-multiple-from-list")
-      {
-        $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().attr('multiple', true);
-      }
-    }
-    else
-    {
+  $(document).on('change', '.field-type-custom', () => {
+
+    const field_type = $(this).val();
+    if (field_type == "choose-from-list") {
+
+      $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().removeAttr('multiple', false);
+    } else if (field_type == "choose-multiple-from-list") {
+
+      $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().attr('multiple', true);
+    } else {
+
       $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').hide();
     }
   });
 
   /**/
-  $(document).ready(function(){
-    var field_type_object = $('.field-type-custom');
+  $(document).ready(() => {
+
+    const field_type_object = $('.field-type-custom');
     field_type_object.each(function(index, data){
-      if ($(this).val() == "choose-from-list")
-      {
+      if ($(this).val() == "choose-from-list") {
         $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().removeAttr('multiple', false);
-      }
-      else if ($(this).val() == "choose-multiple-from-list")
-      {
+      } else if ($(this).val() == "choose-multiple-from-list") {
         $(this).parent('div').parent('div').next('div').children('div').children('.select-type-custom').show().attr('multiple', true);
       }
     });
-    {% if type == "edit-list" %}
-    var initial_form = $('#id_form-INITIAL_FORMS').val();
-    $('#id_form-'+initial_form+'-id').next('div').hide();
-    $('#id_form-'+initial_form+'-id').remove('div');
-    {% endif %}
+
+    const type = "{{ type | safe }}";
+    if (type == "edit-list") {
+
+      var initial_form = $('#id_form-INITIAL_FORMS').val();
+      $('#id_form-'+initial_form+'-id').next('div').hide();
+      $('#id_form-'+initial_form+'-id').remove('div');
+    } else {
+      // Do nothing for now
+    }
   });
 
   /* Code 07-01-2021 */
   /* code for remove the list field */
-  $(document).on('click', '.remove-list-field', function(){
-    {% if type == "edit-list" %}
-    var initial_form_id = $(this).attr('data-attr');
-    if (initial_form_id !== "None")
-    {
-      var list_field_id = $(this).parent('div').prev('input').val();
-      $('#form-container').append(
-        '<input type="hidden" name="delete_list_field_ids" value='+list_field_id+'>'
-      );
-      // var initial_form_value = $('#id_form-INITIAL_FORMS').val();
-      // $('#id_form-INITIAL_FORMS').val(Number(initial_form_value)-1);
-      // $(this).parent().prev('input').remove();
-    };
-    {% endif %}
+  $(document).on('click', '.remove-list-field', () => {
+
+    const type = "{{ type | safe }}";
+    if (type == "edit-list") {
+
+      var initial_form_id = $(this).attr('data-attr');
+      if (initial_form_id !== "None") {
+        var list_field_id = $(this).parent('div').prev('input').val();
+        $('#form-container').append(
+          '<input type="hidden" name="delete_list_field_ids" value='+list_field_id+'>'
+        );
+        // var initial_form_value = $('#id_form-INITIAL_FORMS').val();
+        // $('#id_form-INITIAL_FORMS').val(Number(initial_form_value)-1);
+        // $(this).parent().prev('input').remove();
+      } else {
+        // Do nothing for now
+      }
+    } else {
+      // Do nothing for now
+    }
+
     const totalForms = $("#id_form-TOTAL_FORMS").val();
     $("#id_form-TOTAL_FORMS").val(Number(totalForms)-1);
     $(this).parent().hide();
   });
+
 </script>
