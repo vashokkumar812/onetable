@@ -1187,5 +1187,5 @@ def generate_random_string(string_length=10):
     random = random.replace("-","") # Just letters and numbers
     return random[0:string_length] # Truncate to correct length
 
-def randStr(chars = string.ascii_uppercase + string.digits, N=10):
+def randStr(chars = string.ascii_uppercase + string.ascii_lowercase + string.digits, N=10):
 	return ''.join(random.choice(chars) for _ in range(N))
