@@ -10,7 +10,7 @@ from django.core import serializers
 import uuid
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
-from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset, modelformset_factory
+from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset
 
 # TODO
 # On all views, @login_required prevents users not logged in, but need method and
@@ -393,10 +393,10 @@ def notes(request, organization_pk, app_pk):
 
 @login_required
 def lists(request, organization_pk, app_pk):
-
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
-    lists = List.objects.all().filter(status='active', app=app)
+    # lists = List.objects.all().filter(status='active', app=app)
+    lists = List.objects.filter(status='active', app=app)
 
     if request.is_ajax() and request.method == "GET":
 
@@ -430,7 +430,7 @@ def lists(request, organization_pk, app_pk):
 
 @login_required
 def list(request, organization_pk, app_pk, list_pk):
-
+    print('=============in else')
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
@@ -456,7 +456,7 @@ def list(request, organization_pk, app_pk, list_pk):
         return JsonResponse(data=data_dict, safe=False)
 
     else:
-
+        print('=============in else')
         # If accessing the url directly, load full page
 
         context = {
@@ -511,6 +511,8 @@ def create_list(request, organization_pk, app_pk):
                     list_field.primary = True
                     list_field.required = True
                     list_field.visible = True
+                list_field.save()
+                list_field.field_id = list_field.id
                 list_field.save()
 
                 for select_list_id in request.POST.getlist(f'form-{index}-select_list'):
@@ -622,7 +624,7 @@ def save_list(request, organization_pk, app_pk):
             status='active',
             created_at=timezone.now(),
             created_user=request.user)
-        list.save();
+        list.save()
 
         for field in field_list:
             list_field = ListField.objects.create(
@@ -644,7 +646,7 @@ def save_list(request, organization_pk, app_pk):
                 list = get_object_or_404(List, pk=field['fieldList'])
                 list_field.select_list=list
 
-            list_field.save();
+            list_field.save()
 
         # Redirect based on ajax call from frontend on success
 
@@ -670,7 +672,7 @@ def update_list(request, organization_pk, app_pk, list_pk):
         if list_name is not list.name:
             list.name=list_name
             list.last_updated = timezone.now()
-            list.save();
+            list.save()
 
         field_list = json.loads(request.POST['fields'])
         removed_fields = json.loads(request.POST['removed'])
@@ -701,7 +703,7 @@ def update_list(request, organization_pk, app_pk, list_pk):
                     status='active',
                     created_at=timezone.now(),
                     created_user=request.user)
-                list_field.save();
+                list_field.save()
 
         for field_id in removed_fields:
             try:
@@ -754,10 +756,8 @@ def list_settings(request, organization_pk, app_pk, list_pk):
 #===============================================================================
 # Records
 #===============================================================================
-
 @login_required
 def add_record(request, organization_pk, app_pk, list_pk):
-
     # Very similar to the edit_record view, but includes the field values previously saved
     # Probably a way to combine these views to consolidate
 
@@ -765,7 +765,7 @@ def add_record(request, organization_pk, app_pk, list_pk):
     # 1) Django form.Forms (couldn't find a way to create dynamic forms this approach,
     # but we may be able to find eventually)
     # 2) the models.Model @property for list.list_fields or the record.record_fields >>
-    # needed an object with both the field inforation and value included so we can edit prvious values here
+    # needed an object with both the field inforation and value included so we can edit previous values here
 
     # Instead, only approach could find is building an object here then passing it to the frontend
     # template for rending the form
@@ -785,11 +785,12 @@ def add_record(request, organization_pk, app_pk, list_pk):
         field_object['primary'] = list_field.primary
         field_object['visible'] = list_field.visible
         field_object['order'] = list_field.order
+        field_object['id'] = list_field.id
 
         fields.append(field_object)
+    fields.reverse()
 
     if request.is_ajax() and request.method == "GET":
-
         # Call is ajax, just load main content needed here
 
         html = render_to_string(
@@ -807,7 +808,6 @@ def add_record(request, organization_pk, app_pk, list_pk):
         return JsonResponse(data=data_dict, safe=False)
 
     else:
-
         # If accessing the url directly, load full page
 
         context = {
@@ -815,10 +815,11 @@ def add_record(request, organization_pk, app_pk, list_pk):
             'app': app,
             'list': list,
             'fields': fields,
-            'type': 'edit-record'
+            'type': 'edit-record',
         }
 
         return render(request, 'home/workspace.html', context=context)
+
 
 @login_required
 def save_record(request, organization_pk, app_pk, list_pk):
@@ -847,14 +848,9 @@ def save_record(request, organization_pk, app_pk, list_pk):
             created_at=timezone.now(),
             last_updated=timezone.now(),
             created_user=request.user)
-        record.save();
+        record.save()
 
     for field in fields:
-
-            # Print for testing / temporary
-            print('---------------')
-            print(field['fieldId'])
-            print(field['fieldValue'])
 
             if field['fieldValue'] is not None:
                 # Only save a RecordField object if there is a value
@@ -919,6 +915,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
     data_dict = {"success": True}
 
     return JsonResponse(data=data_dict, safe=False)
+
 
 @login_required
 def record(request, organization_pk, app_pk, list_pk, record_pk):
@@ -1121,14 +1118,13 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
         field_object['primary'] = list_field.primary
         field_object['visible'] = list_field.visible
         field_object['order'] = list_field.order
-
         # Get the field value if it exists
         for record_field in record.record_fields:
             if list_field.id == record_field.list_field.id:
                 field_object['value'] = record_field.value
 
         fields.append(field_object)
-
+    fields.reverse()
     if request.is_ajax() and request.method == "GET":
 
         # Call is ajax, just load main content needed here

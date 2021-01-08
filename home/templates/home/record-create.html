@@ -25,17 +25,17 @@
               {% if field.field_type == 'text' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" type="text" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %}>
+                  <input class="form-control form-control-solid record-field test" id="field_{{ field.field_id }}" type="text" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %} {% if field.required %}required{% endif %}>
                 </div>
               {% elif field.field_type == 'long-text' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <textarea class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" rows="3" placeholder="Input response here">{% if field.value %}{{ field.value }}{% endif %}</textarea>
+                  <textarea class="form-control form-control-solid record-field test" id="field_{{ field.field_id }}" rows="3" placeholder="Input response here" {% if field.required %}required{% endif %}>{% if field.value %}{{ field.value }}{% endif %}</textarea>
                 </div>
               {% elif field.field_type == 'number' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" type="number" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %}>
+                  <input class="form-control form-control-solid record-field test" id="field_{{ field.field_id }}" type="number" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %} {% if field.required %}required{% endif %}>
                 </div>
               {% endif %}
             {% endfor %}
@@ -49,7 +49,6 @@
 
 <!-- Include JS here that needs template tags -->
 <script>
-
   function saveRecord() {
     // Get the values from the form
     var field_values = [];
@@ -69,17 +68,17 @@
 
     const record = "{{ record | safe }}"
     if (record) {
-      data.record_id = record.id
+      data.record_id = record
     }
-
     $.ajax({
       type: "POST",
       dataType: 'json',
       url: "{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}",
         data: data,
         success: function(data) {
-
+          console.log(data);
           if (data.success) {
+            window.location.href = "{% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}"
             // Go to the record page here
           } else {
             alert("There was an error, please try again!")

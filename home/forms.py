@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import modelformset_factory
-
 from .models import Organization, App, List, ListField
+
 
 class OrganizationForm(forms.ModelForm):
 
@@ -14,6 +14,7 @@ class OrganizationForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }
 
+
 class AppForm(forms.ModelForm): #(Workspaces)
 
     class Meta:
@@ -24,6 +25,7 @@ class AppForm(forms.ModelForm): #(Workspaces)
             'name': forms.TextInput(attrs={'class':'form-control form-control-solid'}),
             'description': forms.TextInput(attrs={'class':'form-control form-control-solid'})
         }
+
 
 class ListForm(forms.ModelForm): #(Workspaces)
 

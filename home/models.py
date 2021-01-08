@@ -7,6 +7,7 @@ from datetime import date
 from django.utils import timezone
 from django.db.models import JSONField
 
+
 class Organization(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
@@ -31,6 +32,7 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class OrganizationUser(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
@@ -60,6 +62,7 @@ class OrganizationUser(models.Model):
         blank=False,
         default='active',
     )
+
 
 class App(models.Model):
     name = models.CharField(max_length=200)
@@ -117,6 +120,7 @@ class AppUser(models.Model):
         default='active',
     )
 
+
 class Menu(models.Model):
     name = models.CharField(max_length=200)
     app = models.ForeignKey('App', on_delete=models.SET_NULL, null=True)
@@ -163,7 +167,10 @@ class List(models.Model):
 
     @property
     def list_fields(self):
-        return ListField.objects.filter(list=self, status='active').order_by('order') \
+        # return ListField.objects.filter(list=self, status='active').order_by('order') \
+        #     .select_related('list__app', 'list__created_user') \
+        #     .select_related('created_user')
+        return ListField.objects.filter(list=self, status='active').order_by('primary') \
             .select_related('list__app', 'list__created_user') \
             .select_related('created_user')
 
@@ -214,6 +221,10 @@ class ListField(models.Model):
 
     def __str__(self):
         return self.field_label
+ 
+    def save(self, *args, **kwargs):
+        self.field_id = str(self.id)
+        super(ListField, self).save(*args, **kwargs)
 
 
 class Record(models.Model):
@@ -249,7 +260,8 @@ class Record(models.Model):
             .get(record=self)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
+
 
 class RecordField(models.Model):
     record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='record')
@@ -274,4 +286,4 @@ class RecordField(models.Model):
     )
 
     def __str__(self):
-        return self.id
+        return str(self.id)
