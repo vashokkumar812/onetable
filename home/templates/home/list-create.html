@@ -151,8 +151,7 @@
 
   /* Code 05-01-2021*/
   /* this code is execute when user choose the field type */
-  $(document).on('change', '.field-type-custom', () => {
-
+  $(document).on('change', '.field-type-custom', function() {
     const field_type = $(this).val();
     if (field_type == "choose-from-list") {
 
