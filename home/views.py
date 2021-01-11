@@ -486,7 +486,6 @@ def create_list(request, organization_pk, app_pk):
         # Reduce the queryset for select_list field to just active lists in current app
         for form in formset:
             form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
-            # form.fields['select_list'].empty_label = ''
 
     elif request.method == 'POST':
         listform = ListForm(request.POST)
@@ -524,6 +523,7 @@ def create_list(request, organization_pk, app_pk):
             return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
         else:
             print(formset.errors)
+    
     context={
         'organization': organization,
         'app': app,
@@ -776,7 +776,6 @@ def add_record(request, organization_pk, app_pk, list_pk):
 
     fields = []
     for list_field in list.list_fields:
-
         field_object = {}
         field_object['field_id'] = list_field.field_id
         field_object['field_label'] = list_field.field_label
@@ -786,7 +785,8 @@ def add_record(request, organization_pk, app_pk, list_pk):
         field_object['visible'] = list_field.visible
         field_object['order'] = list_field.order
         field_object['id'] = list_field.id
-
+        if list_field.field_type == "choose-from-list":
+            field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active").values_list('record', 'value')
         fields.append(field_object)
     fields.reverse()
 
@@ -851,16 +851,18 @@ def save_record(request, organization_pk, app_pk, list_pk):
         record.save()
 
     for field in fields:
-
             if field['fieldValue'] is not None:
                 # Only save a RecordField object if there is a value
 
                 if record_id is not None:
-
                     try:
                         # Update existing record field
                         record_field = RecordField.objects.get(status='active', list_field__field_id=field['fieldId'], record=record)
-                        record_field.value = field['fieldValue']
+                        if field['fieldValue'].isnumeric():
+                           record_field.selected_record_id = field['fieldValue']
+                           record_field.value = ""
+                        else: 
+                            record_field.value = field['fieldValue']
                         record_field.last_updated = timezone.now()
                         record_field.save()
 
@@ -875,18 +877,22 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             record_field = RecordField.objects.create(
                                 record=record,
                                 list_field=list_field,
-                                value=field['fieldValue'],
                                 status='active',
                                 created_at=timezone.now(),
                                 created_user=request.user)
                             record_field.save()
-
+                            
+                            if field['fieldValue'].isnumeric():
+                                record_field.selected_record_id = field['fieldValue']
+                                record_field.value = ""
+                            else:
+                                record_field.value = field['fieldValue']
+                            record_field.save()
                         except ListField.DoesNotExist:
                             # Easy error handling for now
                             pass
 
                 else:
-
                     try:
 
                         # Create new record field
@@ -896,12 +902,17 @@ def save_record(request, organization_pk, app_pk, list_pk):
                         record_field = RecordField.objects.create(
                             record=record,
                             list_field=list_field,
-                            value=field['fieldValue'],
                             status='active',
                             created_at=timezone.now(),
                             created_user=request.user)
                         record_field.save()
-
+                        
+                        if field['fieldValue'].isnumeric():
+                            record_field.selected_record_id = field['fieldValue']
+                            record_field.value = ""
+                        else:
+                            record_field.value = field['fieldValue']
+                        record_field.save()
                     except ListField.DoesNotExist:
                         # Easy error handling for now
                         pass
@@ -1119,9 +1130,12 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
         field_object['visible'] = list_field.visible
         field_object['order'] = list_field.order
         # Get the field value if it exists
-        for record_field in record.record_fields:
-            if list_field.id == record_field.list_field.id:
-                field_object['value'] = record_field.value
+        if list_field.field_type == "choose-from-list":
+            field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active").values_list('record', 'value')
+        else:
+            for record_field in record.record_fields:
+                if list_field.id == record_field.list_field.id:
+                    field_object['value'] = record_field.value
 
         fields.append(field_object)
     fields.reverse()

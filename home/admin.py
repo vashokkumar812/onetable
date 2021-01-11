@@ -15,8 +15,13 @@ class RecordAdmin(admin.ModelAdmin):
 
 
 class RecordFieldAdmin(admin.ModelAdmin):
-    list_display = ['id', 'record', 'list_field', 'value', 'selected_record', 'created_at', 'created_user', 'last_updated', 'status']
+    list_display = ['id', 'record', 'list_field', 'list_field_id', 'value', 'selected_record', 'created_at', 'created_user', 'last_updated', 'status']
 
+    def list_field_id(self, obj):
+        try:
+            return obj.list_field.id
+        except:
+            pass
 
 admin.site.register(List, ListAdmin)
 admin.site.register(ListField, ListFieldAdmin)

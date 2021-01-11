@@ -25,18 +25,28 @@
               {% if field.field_type == 'text' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <input class="form-control form-control-solid record-field test" id="field_{{ field.field_id }}" type="text" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %} {% if field.required %}required{% endif %}>
+                  <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" type="text" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %} {% if field.required %}required{% endif %}>
                 </div>
               {% elif field.field_type == 'long-text' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <textarea class="form-control form-control-solid record-field test" id="field_{{ field.field_id }}" rows="3" placeholder="Input response here" {% if field.required %}required{% endif %}>{% if field.value %}{{ field.value }}{% endif %}</textarea>
+                  <textarea class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" rows="3" placeholder="Input response here" {% if field.required %}required{% endif %}>{% if field.value %}{{ field.value }}{% endif %}</textarea>
                 </div>
               {% elif field.field_type == 'number' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                  <input class="form-control form-control-solid record-field test" id="field_{{ field.field_id }}" type="number" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %} {% if field.required %}required{% endif %}>
+                  <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" type="number" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %} {% if field.required %}required{% endif %}>
                 </div>
+              {% elif field.field_type == 'choose-from-list' %}
+              <div class="form-group">
+                <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
+                <select class="form-control form-control-solid record-field" id="field_{{ field.field_id }}">
+                  {% for id, data in field.select_record %}
+                  <option value="{{id}}">{{data}}</option>
+                  {% endfor %}
+                </select>
+                <!--<input class="form-control form-control-solid record-field" id="field_{# {{ field.field_id }} #}" type="number" placeholder="Input response here" {# {% if field.value %} #}value='{# {{ field.value }} #}'{# {% endif %} #} {# {% if field.required %} #}required{# {% endif %} #}>-->
+              </div>
               {% endif %}
             {% endfor %}
         </form>

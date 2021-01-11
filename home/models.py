@@ -177,6 +177,7 @@ class List(models.Model):
     def __str__(self):
         return self.name
 
+
 class ListField(models.Model):
     list = models.ForeignKey('List', on_delete=models.SET_NULL, null=True, related_name='list')
     field_id = models.CharField(max_length=10)
@@ -258,7 +259,7 @@ class Record(models.Model):
             .select_related('record__list', 'record__created_user') \
             .select_related('created_user') \
             .get(record=self)
-
+        
     def __str__(self):
         return str(self.id)
 

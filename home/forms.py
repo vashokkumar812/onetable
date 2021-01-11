@@ -35,7 +35,7 @@ class ListForm(forms.ModelForm): #(Workspaces)
         widgets = {
             'name': forms.TextInput(attrs={
                 'class':'form-control form-control-solid p-3',
-                'placeholder': 'Enter a name for this list'
+                'placeholder': 'Enter a name for this list',
                 }
             )
         }
