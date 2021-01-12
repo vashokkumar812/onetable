@@ -789,6 +789,7 @@ def add_record(request, organization_pk, app_pk, list_pk):
             field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active").values_list('record', 'value')
         fields.append(field_object)
     fields.reverse()
+    print('=================================', fields)
 
     if request.is_ajax() and request.method == "GET":
         # Call is ajax, just load main content needed here
@@ -833,14 +834,23 @@ def save_record(request, organization_pk, app_pk, list_pk):
     record_id = request.POST.get('record_id', None)
     fields = json.loads(request.POST['field_values'])
 
+    print('==================record_id', record_id)
+    print('==================fields', fields)
+
     # TODO
     # Needs error handling here verify if the form is valid (i.e. all required fields, acceptable data types, etc)
 
     record = None # Create object globally outside of the if/else
+
+    print('==================record', record)
+
     if record_id is not None:
+        print('==================record id is not none')
         # Get the existing record / this is a record being edited
         record = get_object_or_404(Record, pk=record_id)
+        print('==================record obj', record)
     else:
+        print('==================record id is none')
         # Add a new record
         record = Record.objects.create(
             list=list,
@@ -849,16 +859,20 @@ def save_record(request, organization_pk, app_pk, list_pk):
             last_updated=timezone.now(),
             created_user=request.user)
         record.save()
+        print('new record is created')
 
     for field in fields:
+            print('=================field single dict', field)
             if field['fieldValue'] is not None:
+                print('=============field value is not none')
                 # Only save a RecordField object if there is a value
 
                 if record_id is not None:
+                    print('==================record id is not none', record_id)
                     try:
                         # Update existing record field
                         record_field = RecordField.objects.get(status='active', list_field__field_id=field['fieldId'], record=record)
-                        if field['fieldValue'].isnumeric():
+                        if field['fieldType'] == "choose-from-list":
                            record_field.selected_record_id = field['fieldValue']
                            record_field.value = ""
                         else: 
@@ -882,7 +896,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                                 created_user=request.user)
                             record_field.save()
                             
-                            if field['fieldValue'].isnumeric():
+                            if field['fieldType'] == "choose-from-list":
                                 record_field.selected_record_id = field['fieldValue']
                                 record_field.value = ""
                             else:
@@ -893,6 +907,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             pass
 
                 else:
+                    print('===============record id is none')
                     try:
 
                         # Create new record field
@@ -907,7 +922,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             created_user=request.user)
                         record_field.save()
                         
-                        if field['fieldValue'].isnumeric():
+                        if field['fieldType'] == "choose-from-list":
                             record_field.selected_record_id = field['fieldValue']
                             record_field.value = ""
                         else:
@@ -924,6 +939,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
     # Redirect based on ajax call from frontend on success
 
     data_dict = {"success": True}
+    print('==================', data_dict)
 
     return JsonResponse(data=data_dict, safe=False)
 

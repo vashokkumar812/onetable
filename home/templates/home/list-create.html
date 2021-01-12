@@ -114,10 +114,9 @@
     const container = document.querySelector("#form-container");
     const addButton = document.querySelector("#add-form");
     const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
-    console.log('=========================', fieldForm.length);
-    console.log(fieldForm);
 
     addButton.addEventListener('click', (e) => {
+      const fieldForm = document.querySelectorAll(".field-form");
       e.preventDefault();
       let formNum = fieldForm.length-1;      
       {% if type == "edit-list" %}

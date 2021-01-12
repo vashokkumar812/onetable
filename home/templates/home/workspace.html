@@ -61,8 +61,6 @@ class="bg-white"
 <script>
 
   function getPage(url) {
-    console.log('ajax start');
-    console.log(url);
     $.ajax({
         type: "GET",
         url: url,
@@ -70,7 +68,6 @@ class="bg-white"
             'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
         },
         success: function(data) {
-            console.log('success');
             // append html to the posts div
             $('#main-content').html(data['html_from_view']);
         },
