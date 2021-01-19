@@ -430,7 +430,6 @@ def lists(request, organization_pk, app_pk):
 
 @login_required
 def list(request, organization_pk, app_pk, list_pk):
-    print('=============in else')
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
@@ -456,7 +455,6 @@ def list(request, organization_pk, app_pk, list_pk):
         return JsonResponse(data=data_dict, safe=False)
 
     else:
-        print('=============in else')
         # If accessing the url directly, load full page
 
         context = {
@@ -499,12 +497,15 @@ def create_list(request, organization_pk, app_pk):
             list.created_at = timezone.now()
             list.save() # Save here then update primary field once field is saved
             # Loop through the list field forms submitted
+            list_field_order = 0
+            change_from_select_list = False
             for index, form in enumerate(formset):
                 # Save the list field
                 list_field = form.save(commit=False)
                 list_field.list = list
                 list_field.created_user = request.user
                 list_field.created_at = timezone.now()
+                list_field.order = list_field_order
 
                 if index == 0:
                     list_field.primary = True
@@ -518,8 +519,14 @@ def create_list(request, organization_pk, app_pk):
                     if form.cleaned_data.get('select_list') is not None:
                         if int(select_list_id) != int(form.cleaned_data.get('select_list').id):
                             ListField.objects.create(
-                                created_at=timezone.now(), created_user=request.user, list=list, field_label=request.POST[f'form-{index}-field_label'], field_type=request.POST[f'form-{index}-field_type'], select_list_id=int(select_list_id)
+                                created_at=timezone.now(), created_user=request.user, list=list, field_label=request.POST[f'form-{index}-field_label'], field_type=request.POST[f'form-{index}-field_type'], select_list_id=int(select_list_id, order=list_field_order)
                             )
+                            list_field_order += 1
+                            change_from_select_list = True
+                
+                if change_from_select_list is False:
+                    list_field_order += 1
+                
             return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
         else:
             print(formset.errors)
@@ -542,7 +549,6 @@ def edit_list(request, organization_pk, app_pk, list_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
-
     # Django formset stuff
 
     # Use model formset and not inline formset for more control over the data
@@ -550,7 +556,7 @@ def edit_list(request, organization_pk, app_pk, list_pk):
 
     if request.method == 'GET':
         listform = ListForm(request.GET or None, instance=list)
-        formset = ListFieldFormset(queryset=ListField.objects.filter(list=list, status='active'))
+        formset = ListFieldFormset(queryset=ListField.objects.filter(list=list, status='active').order_by('order'))
         # Reduce the queryset for select_list field to just active lists in current app
         for form in formset:
             form.fields['select_list'].queryset = List.objects.filter(app=app, status='active')
@@ -568,6 +574,7 @@ def edit_list(request, organization_pk, app_pk, list_pk):
             list.updated_at = timezone.now()
             list.save() # Save here then update primary field once field is saved
             # Loop through the list field forms submitted
+            list_field_order = 0
             for index, form in enumerate(formset):
                 if int(index) != int(request.POST.get('form-INITIAL_FORMS')):
                 # Save the list field
@@ -575,8 +582,11 @@ def edit_list(request, organization_pk, app_pk, list_pk):
                     list_field.list = list
                     list_field.updated_at = timezone.now()
                     list_field.created_user = request.user
+                    list_field.order = list_field_order
                     list_field.save()
             
+                    list_field_order += 1
+
             remove_list_field_ids = request.POST.getlist('delete_list_field_ids')
             for list_field_id in remove_list_field_ids:
                 try:
@@ -789,7 +799,6 @@ def add_record(request, organization_pk, app_pk, list_pk):
             field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active").values_list('record', 'value')
         fields.append(field_object)
     fields.reverse()
-    print('=================================', fields)
 
     if request.is_ajax() and request.method == "GET":
         # Call is ajax, just load main content needed here
@@ -834,23 +843,15 @@ def save_record(request, organization_pk, app_pk, list_pk):
     record_id = request.POST.get('record_id', None)
     fields = json.loads(request.POST['field_values'])
 
-    print('==================record_id', record_id)
-    print('==================fields', fields)
-
     # TODO
     # Needs error handling here verify if the form is valid (i.e. all required fields, acceptable data types, etc)
 
     record = None # Create object globally outside of the if/else
 
-    print('==================record', record)
-
     if record_id is not None:
-        print('==================record id is not none')
         # Get the existing record / this is a record being edited
         record = get_object_or_404(Record, pk=record_id)
-        print('==================record obj', record)
     else:
-        print('==================record id is none')
         # Add a new record
         record = Record.objects.create(
             list=list,
@@ -859,22 +860,18 @@ def save_record(request, organization_pk, app_pk, list_pk):
             last_updated=timezone.now(),
             created_user=request.user)
         record.save()
-        print('new record is created')
 
     for field in fields:
-            print('=================field single dict', field)
             if field['fieldValue'] is not None:
-                print('=============field value is not none')
                 # Only save a RecordField object if there is a value
 
                 if record_id is not None:
-                    print('==================record id is not none', record_id)
                     try:
                         # Update existing record field
                         record_field = RecordField.objects.get(status='active', list_field__field_id=field['fieldId'], record=record)
                         if field['fieldType'] == "choose-from-list":
                            record_field.selected_record_id = field['fieldValue']
-                           record_field.value = ""
+                           record_field.value = field['selectListValue']
                         else: 
                             record_field.value = field['fieldValue']
                         record_field.last_updated = timezone.now()
@@ -898,7 +895,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             
                             if field['fieldType'] == "choose-from-list":
                                 record_field.selected_record_id = field['fieldValue']
-                                record_field.value = ""
+                                record_field.value = field['selectListValue']
                             else:
                                 record_field.value = field['fieldValue']
                             record_field.save()
@@ -907,7 +904,6 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             pass
 
                 else:
-                    print('===============record id is none')
                     try:
 
                         # Create new record field
@@ -924,7 +920,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                         
                         if field['fieldType'] == "choose-from-list":
                             record_field.selected_record_id = field['fieldValue']
-                            record_field.value = ""
+                            record_field.value = field['selectListValue']
                         else:
                             record_field.value = field['fieldValue']
                         record_field.save()
@@ -939,7 +935,6 @@ def save_record(request, organization_pk, app_pk, list_pk):
     # Redirect based on ajax call from frontend on success
 
     data_dict = {"success": True}
-    print('==================', data_dict)
 
     return JsonResponse(data=data_dict, safe=False)
 

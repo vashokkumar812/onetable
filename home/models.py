@@ -170,9 +170,13 @@ class List(models.Model):
         # return ListField.objects.filter(list=self, status='active').order_by('order') \
         #     .select_related('list__app', 'list__created_user') \
         #     .select_related('created_user')
-        return ListField.objects.filter(list=self, status='active').order_by('primary') \
+        return ListField.objects.filter(list=self, status='active').order_by('-order') \
             .select_related('list__app', 'list__created_user') \
             .select_related('created_user')
+
+    @property
+    def total_record(self):
+        return Record.objects.filter(list=self).count()
 
     def __str__(self):
         return self.name
@@ -251,7 +255,7 @@ class Record(models.Model):
     def record_fields(self):
         return RecordField.objects.filter(record=self, status='active') \
             .select_related('record__list', 'record__created_user') \
-            .select_related('created_user')
+            .select_related('created_user').order_by('list_field__order')
 
     @property
     def primary_field(self):
