@@ -36,7 +36,15 @@
     {% for form in formset %}
     {{ form.id }}
     <div class="card card-header-actions field-form mb-3">
-      <a class="text-right pt-3 pr-3 text-danger remove-list-field" href="javascript:void(0);" style="text-decoration: none;" {% if type == "edit-list" %}data-attr="{{form.id.value}}"{% endif %}>X</a>
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-4 text-right pt-3 pr-3"><span class="btn btn-info">Move Up</span></div>
+          <div class="col-sm-4 text-right pt-3 pr-3"><span class="btn btn-info">Move Down</span></div>
+          <div class="col-sm-4 text-right pt-3 pr-3">
+            <a class="text-danger remove-list-field" href="javascript:void(0);" style="text-decoration: none;" {% if type == "edit-list" %}data-attr="{{form.id.value}}"{% endif %}>X</a>
+          </div>
+        </div>
+      </div>
         <div class="card-body">
           <div class="row mb-3">
             <div class="col-6">

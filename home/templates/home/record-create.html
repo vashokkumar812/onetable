@@ -42,7 +42,7 @@
                 <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
                 <select class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" data-attr="{{field.field_type}}">
                   {% for id, data in field.select_record %}
-                  <option value="{{id}}">{{data}}</option>
+                  <option value="{{id}}" data-value="{{data}}">{{data}}</option>
                   {% endfor %}
                 </select>
                 <!--<input class="form-control form-control-solid record-field" id="field_{# {{ field.field_id }} #}" type="number" placeholder="Input response here" {# {% if field.value %} #}value='{# {{ field.value }} #}'{# {% endif %} #} {# {% if field.required %} #}required{# {% endif %} #}>-->
@@ -70,6 +70,9 @@
      field['fieldId'] = id;
      field['fieldValue'] = val;
      field['fieldType'] = field_type;
+     if (field_type === "choose-from-list"){
+      field['selectListValue'] = $(this).find(':selected').data('value');
+     }
      field_values.push(field);
     });
     const data = {
