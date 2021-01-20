@@ -37,10 +37,16 @@
     {{ form.id }}
     <div class="card card-header-actions field-form mb-3">
       <div class="container">
-        <div class="row">
-          <div class="col-sm-4 text-right pt-3 pr-3"><span class="btn btn-info">Move Up</span></div>
-          <div class="col-sm-4 text-right pt-3 pr-3"><span class="btn btn-info">Move Down</span></div>
-          <div class="col-sm-4 text-right pt-3 pr-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="pt-3 pr-3">
+            <span class="btn btn-info move-up-btn p-2 arrow-up">
+              <i class="fas fa-arrow-up"></i>
+            </span>
+            <span class="btn btn-info move-down-btn mx-2 p-2 arrow-down">
+              <i class="fas fa-arrow-down"></i>
+            </span>
+          </div>
+          <div class="pt-3 pr-3">
             <a class="text-danger remove-list-field" href="javascript:void(0);" style="text-decoration: none;" {% if type == "edit-list" %}data-attr="{{form.id.value}}"{% endif %}>X</a>
           </div>
         </div>
@@ -191,7 +197,7 @@
     var initial_form_id = $(this).attr('data-attr');
     if (initial_form_id !== "None")
     {
-      var list_field_id = $(this).parent('div').prev('input').val();
+      var list_field_id = $(this).parent('div').parent('div').parent('div').parent('div').prev('input').val();
       $('#form-container').append(
         '<input type="hidden" name="delete_list_field_ids" value='+list_field_id+'>'
       );
@@ -202,6 +208,45 @@
     {% endif %}
     const totalForms = $("#id_form-TOTAL_FORMS").val();
     $("#id_form-TOTAL_FORMS").val(Number(totalForms)-1);
-    $(this).parent().hide();
+    $(this).parent('div').parent('div').parent('div').parent('div').hide();
+  });
+
+  /* code for Up/Down Arrow Functionality */
+  $(document).on('click', '.arrow-up', function(){
+    var current = $(this).closest('.field-form');
+    {% if type == "edit-list" %}
+    var previous_input = current.prev('input');
+    var previous = current.prev('input').prev('.field-form');
+    {% else %}
+    var previous = current.prev('.field-form');
+    {% endif %}
+    // var current = $(this).closest('.field-form');
+    // var previous = current.prev('.field-form');
+    if (previous.length !== 0){
+      current.insertBefore(previous);
+      {% if type == "edit-list" %}
+      previous_input.insertBefore(previous);
+      {% endif %}
+    }
+    return false;
+  });
+
+  $(document).on('click', '.arrow-down', function(){
+    var current = $(this).closest('.field-form');
+    {% if type == "edit-list" %}
+    var next_input = current.next('input');
+    var next = current.next('input').next('.field-form');
+    {% else %}
+    var next = current.next('.field-form');
+    {% endif %}
+    // var current = $(this).closest('.field-form');
+    // var next = current.next('.field-form');
+    if (next.length !== 0){
+      current.insertAfter(next);
+      {% if type == "edit-list" %}
+      next_input.insertAfter(next);
+      {% endif %}
+    }
+    return false;
   });
 </script>
