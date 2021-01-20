@@ -214,6 +214,8 @@
   /* code for Up/Down Arrow Functionality */
   $(document).on('click', '.arrow-up', function(){
     var current = $(this).closest('.field-form');
+    var currentFormCounter = current[0].getElementsByTagName('input')[0].getAttribute('name')[5];
+    console.log(currentFormCounter);
     {% if type == "edit-list" %}
     var previous_input = current.prev('input');
     var previous = current.prev('input').prev('.field-form');
@@ -223,10 +225,20 @@
     // var current = $(this).closest('.field-form');
     // var previous = current.prev('.field-form');
     if (previous.length !== 0){
+      var previousFormCounter = previous[0].getElementsByTagName('input')[0].getAttribute('name')[5];
+      console.log(previousFormCounter);
       current.insertBefore(previous);
       {% if type == "edit-list" %}
       previous_input.insertBefore(previous);
       {% endif %}
+      // const formRegex = RegExp(`form-(\\d){1}-`,'g');
+      // console.log(current);
+      // var c = current[0].childNodes
+      // c.forEach(function(i, j){
+      //   console.log(i, j.fin);
+      // })
+      // current[0].innerHTML = current[0].innerHTML.replace(formRegex, `form-${previousFormCounter}-`);
+      // previous[0].innerHTML = previous[0].innerHTML.replace(formRegex, `form-${currentFormCounter}-`);
     }
     return false;
   });
