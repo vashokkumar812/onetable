@@ -149,7 +149,6 @@
     });
   });
 
-  /* Code 05-01-2021*/
   /* this code is execute when user choose the field type */
   $(document).on('change', '.field-type-custom', function(){
     var field_type = $(this).val();
@@ -170,7 +169,6 @@
     }
   });
 
-  /**/
   $(document).ready(function(){
     var field_type_object = $('.field-type-custom');
     field_type_object.each(function(index, data){
@@ -190,7 +188,6 @@
     {% endif %}
   });
 
-  /* Code 07-01-2021 */
   /* code for remove the list field */
   $(document).on('click', '.remove-list-field', function(){
     {% if type == "edit-list" %}
@@ -201,9 +198,6 @@
       $('#form-container').append(
         '<input type="hidden" name="delete_list_field_ids" value='+list_field_id+'>'
       );
-      // var initial_form_value = $('#id_form-INITIAL_FORMS').val();
-      // $('#id_form-INITIAL_FORMS').val(Number(initial_form_value)-1);
-      // $(this).parent().prev('input').remove();
     };
     {% endif %}
     const totalForms = $("#id_form-TOTAL_FORMS").val();
@@ -211,51 +205,156 @@
     $(this).parent('div').parent('div').parent('div').parent('div').hide();
   });
 
-  /* code for Up/Down Arrow Functionality */
+  /* code for Up Arrow Functionality with changing the id, name attribute value */
   $(document).on('click', '.arrow-up', function(){
+    // regular expression for change the id, name attribute value
+    const formRegex = RegExp(`form-(\\d){1}-`,'g');
+    // get current HTML Content object
     var current = $(this).closest('.field-form');
+    // extract the numeric value of django id, name attribute ordering value
     var currentFormCounter = current[0].getElementsByTagName('input')[0].getAttribute('name')[5];
-    console.log(currentFormCounter);
+    // get all input tags of current HTML Content
+    var allInputsCurrent = current[0].querySelectorAll('input');
+    // get all select tags of current HTML Content
+    var allSelectsCurrent = current[0].querySelectorAll('select');
+
     {% if type == "edit-list" %}
-    var previous_input = current.prev('input');
-    var previous = current.prev('input').prev('.field-form');
+      // get hidden input field (in this hidden field the database value is save) 
+      var previous_input = current.prev('input');
+      // get upper HTML Content object
+      var previous = current.prev('input').prev('.field-form');
+      // get hidden input field (in this hidden field the database value is save)
+      var next_input = previous.prev('input');
     {% else %}
-    var previous = current.prev('.field-form');
+      // get upper HTML Content object
+      var previous = current.prev('.field-form');
     {% endif %}
-    // var current = $(this).closest('.field-form');
-    // var previous = current.prev('.field-form');
+
     if (previous.length !== 0){
+      // extract the numeric value of django id, name attribute ordering value
       var previousFormCounter = previous[0].getElementsByTagName('input')[0].getAttribute('name')[5];
-      console.log(previousFormCounter);
+      // get all input tags of upper HTML Content
+      var allInputsPrevious = previous[0].querySelectorAll('input');
+      // get all select tags of upper HTML Content
+      var allSelectsPrevious = previous[0].querySelectorAll('select');
+
+      // loop for change the order of all the name and id attributes value of current HTML Content of input tags
+      allInputsCurrent.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${previousFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${previousFormCounter}-`));
+      });
+
+      // loop for change the order of all the name and id attributes value of current HTML Content of select tags
+      allSelectsCurrent.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${previousFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${previousFormCounter}-`));
+      });
+      
+      // loop for change the order of all the name and id attributes value of upper HTML Content input tags
+      allInputsPrevious.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${currentFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${currentFormCounter}-`));
+      });
+
+      // loop for change the order of all the name and id attributes value of upper HTML Content select tags
+      allSelectsPrevious.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${currentFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${currentFormCounter}-`));
+      });
+      
+      // move the HTML Content
       current.insertBefore(previous);
+
       {% if type == "edit-list" %}
+      // this code is implement for change the input tag id and name attribute value of the database id
+      var t1 = previous_input.attr('name');
+      var t2 = next_input.attr('name');
+      var t3 = previous_input.attr('id');
+      var t4 = next_input.attr('id');
+
+      next_input.attr("name", t1);
+      next_input.attr("id", t3);
+      previous_input.attr("name", t2);
+      previous_input.attr("id", t4);
+      
       previous_input.insertBefore(previous);
       {% endif %}
-      // const formRegex = RegExp(`form-(\\d){1}-`,'g');
-      // console.log(current);
-      // var c = current[0].childNodes
-      // c.forEach(function(i, j){
-      //   console.log(i, j.fin);
-      // })
-      // current[0].innerHTML = current[0].innerHTML.replace(formRegex, `form-${previousFormCounter}-`);
-      // previous[0].innerHTML = previous[0].innerHTML.replace(formRegex, `form-${currentFormCounter}-`);
     }
     return false;
   });
 
+  /* code for Down Arrow Functionality */
   $(document).on('click', '.arrow-down', function(){
+    // regular expression for change the id, name attribute value
+    const formRegex = RegExp(`form-(\\d){1}-`,'g');
+    // get current HTML Content object
     var current = $(this).closest('.field-form');
+    // extract the numeric value of django id, name attribute ordering value
+    var currentFormCounter = current[0].getElementsByTagName('input')[0].getAttribute('name')[5];
+    // get all input tags of current HTML Content
+    var allInputsCurrent = current[0].querySelectorAll('input');
+    // get all select tags of current HTML Content
+    var allSelectsCurrent = current[0].querySelectorAll('select');
+
     {% if type == "edit-list" %}
-    var next_input = current.next('input');
-    var next = current.next('input').next('.field-form');
+    // get hidden input field (in this hidden field the database value is save)
+      var next_input = current.next('input');
+      // get lower HTML Content object
+      var next = current.next('input').next('.field-form');
+      // get hidden input field (in this hidden field the database value is save)
+      var previous_input = current.prev('input');
     {% else %}
-    var next = current.next('.field-form');
+      // get lower HTML Content object
+      var next = current.next('.field-form');
     {% endif %}
-    // var current = $(this).closest('.field-form');
-    // var next = current.next('.field-form');
+
     if (next.length !== 0){
+      // extract the numeric value of django id, name attribute ordering value
+      var nextFormCounter = next[0].getElementsByTagName('input')[0].getAttribute('name')[5];
+      // get all input tags of lower HTML Content
+      var allInputsNext = next[0].querySelectorAll('input');
+      // get all select tags of lower HTML Content
+      var allSelectsNext = next[0].querySelectorAll('select');
+
+      // loop for change the order of all the name and id attributes value of current HTML Content of input tags
+      allInputsCurrent.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${nextFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${nextFormCounter}-`));
+      });
+
+      // loop for change the order of all the name and id attributes value of current HTML Content of select tags
+      allSelectsCurrent.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${nextFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${nextFormCounter}-`));
+      });
+      
+      // loop for change the order of all the name and id attributes value of lower HTML Content input tags
+      allInputsNext.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${currentFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${currentFormCounter}-`));
+      });
+
+      // loop for change the order of all the name and id attributes value of lower HTML Content select tags
+      allSelectsNext.forEach(function(element){
+        element.setAttribute("name", element.getAttribute('name').replace(formRegex, `form-${currentFormCounter}-`));
+        element.setAttribute("id", element.getAttribute('id').replace(formRegex, `form-${currentFormCounter}-`));
+      });
+
+      // move the HTML Content
       current.insertAfter(next);
+
       {% if type == "edit-list" %}
+      // this code is implement for change the input tag id and name attribute value of the database id
+      var t1 = next_input.attr('name');
+      var t2 = previous_input.attr('name');
+      var t3 = next_input.attr('id');
+      var t4 = previous_input.attr('id');
+
+      next_input.attr("name", t1);
+      next_input.attr("id", t3);
+      previous_input.attr("name", t2);
+      previous_input.attr("id", t4);
+
       next_input.insertAfter(next);
       {% endif %}
     }

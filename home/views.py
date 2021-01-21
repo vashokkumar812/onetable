@@ -488,7 +488,7 @@ def create_list(request, organization_pk, app_pk):
     elif request.method == 'POST':
         listform = ListForm(request.POST)
         formset = ListFieldFormset(request.POST)
-
+        
         # Verify the form submitted is valid
         if listform.is_valid() and formset.is_valid():
             list = listform.save(commit=False)
@@ -497,9 +497,6 @@ def create_list(request, organization_pk, app_pk):
             list.created_at = timezone.now()
             list.save() # Save here then update primary field once field is saved
             # Loop through the list field forms submitted
-            print('===========================================')
-            print(formset)
-            print('===========================================')
             list_field_order = 0
             change_from_select_list = False
             for index, form in enumerate(formset):
