@@ -519,7 +519,7 @@ def create_list(request, organization_pk, app_pk):
                     if form.cleaned_data.get('select_list') is not None:
                         if int(select_list_id) != int(form.cleaned_data.get('select_list').id):
                             ListField.objects.create(
-                                created_at=timezone.now(), created_user=request.user, list=list, field_label=request.POST[f'form-{index}-field_label'], field_type=request.POST[f'form-{index}-field_type'], select_list_id=int(select_list_id, order=list_field_order)
+                                created_at=timezone.now(), created_user=request.user, list=list, field_label=request.POST[f'form-{index}-field_label'], field_type=request.POST[f'form-{index}-field_type'], select_list_id=int(select_list_id), order=list_field_order
                             )
                             list_field_order += 1
                             change_from_select_list = True
@@ -947,6 +947,7 @@ def record(request, organization_pk, app_pk, list_pk, record_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
     record = get_object_or_404(Record, pk=record_pk)
+    print(record.list.pk)
 
     if request.is_ajax() and request.method == "GET":
 
@@ -1150,6 +1151,7 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
 
         fields.append(field_object)
     fields.reverse()
+    
     if request.is_ajax() and request.method == "GET":
 
         # Call is ajax, just load main content needed here
@@ -1204,3 +1206,12 @@ def generate_random_string(string_length=10):
     random = str(uuid.uuid4()) # Make into string
     random = random.replace("-","") # Just letters and numbers
     return random[0:string_length] # Truncate to correct length
+
+
+def archive_record(request, organization_pk, app_pk, list_pk, record_pk):
+    #   this functional is call when user click on the "Archive Record" button on Record Detail Page
+    record = get_object_or_404(Record, pk=record_pk)
+    record.status = "archived"
+    record.last_updated = timezone.now()
+    record.save()
+    return redirect('list', organization_pk=organization_pk, app_pk=app_pk, list_pk=list_pk)

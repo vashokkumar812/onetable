@@ -145,6 +145,7 @@ class Menu(models.Model):
     def __str__(self):
         return self.name
 
+
 class List(models.Model):
     name = models.CharField(max_length=200)
     app = models.ForeignKey('App', on_delete=models.SET_NULL, null=True)
@@ -176,7 +177,7 @@ class List(models.Model):
 
     @property
     def total_record(self):
-        return Record.objects.filter(list=self).count()
+        return Record.objects.filter(list=self, status="active").count()
 
     def __str__(self):
         return self.name

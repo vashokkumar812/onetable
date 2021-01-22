@@ -42,4 +42,6 @@ urlpatterns = [
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/dashboard/', views.dashboard, name='dashboard'),
 
     path('organizations/<int:organization_pk>/apps/<int:app_pk>/tasks/', views.tasks, name='tasks'),
+
+    path('organizations/<int:organization_pk>/apps/<int:app_pk>/lists/<int:list_pk>/record/<int:record_pk>/', views.archive_record, name='archive_record'),
 ]
