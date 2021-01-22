@@ -112,7 +112,6 @@ def edit_organization(request, organization_pk):
         form = OrganizationForm(request.POST, instance=organization)
         if form.is_valid():
             organization = form.save(commit=False)
-            organization.last_updated = timezone.now()
             organization.save()
             return redirect('organizations')
     else:
@@ -221,7 +220,6 @@ def edit_app(request, organization_pk, app_pk):
         form = AppForm(request.POST, instance=app)
         if form.is_valid():
             app = form.save(commit=False)
-            app.last_updated = timezone.now()
             app.save()
             return redirect('apps', organization_pk=organization_pk)
     else:
@@ -595,7 +593,6 @@ def edit_list(request, organization_pk, app_pk, list_pk):
                 try:
                     list_field_object = ListField.objects.get(id=int(list_field_id))
                     list_field_object.status = "deleted"
-                    list_field_object.last_updated = timezone.now()
                     list_field_object.save()
                 except: pass
             return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
@@ -684,7 +681,6 @@ def update_list(request, organization_pk, app_pk, list_pk):
         list_name = request.POST.get('list_name', None)
         if list_name is not list.name:
             list.name=list_name
-            list.last_updated = timezone.now()
             list.save()
 
         field_list = json.loads(request.POST['fields'])
@@ -860,7 +856,6 @@ def save_record(request, organization_pk, app_pk, list_pk):
             list=list,
             status='active',
             created_at=timezone.now(),
-            last_updated=timezone.now(),
             created_user=request.user)
         record.save()
 
@@ -877,7 +872,6 @@ def save_record(request, organization_pk, app_pk, list_pk):
                            record_field.value = field['selectListValue']
                         else:
                             record_field.value = field['fieldValue']
-                        record_field.last_updated = timezone.now()
                         record_field.save()
 
                     except RecordField.DoesNotExist:
@@ -1195,7 +1189,6 @@ def archive_record(request, organization_pk, app_pk, list_pk, record_pk):
     #   this functional is call when user click on the "Archive Record" button on Record Detail Page
     record = get_object_or_404(Record, pk=record_pk)
     record.status = "archived"
-    record.last_updated = timezone.now()
     record.save()
     return redirect('list', organization_pk=organization_pk, app_pk=app_pk, list_pk=list_pk)
 
