@@ -253,7 +253,7 @@ class Record(models.Model):
 
     @property
     def record_fields(self):
-        return RecordField.objects.filter(record=self, status='active') \
+        return RecordField.objects.filter(record=self, status='active', list_field__status="active") \
             .select_related('record__list', 'record__created_user') \
             .select_related('created_user').order_by('list_field__order')
 
