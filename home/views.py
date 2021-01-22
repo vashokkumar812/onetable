@@ -396,7 +396,7 @@ def lists(request, organization_pk, app_pk):
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
     # lists = List.objects.all().filter(status='active', app=app)
-    lists = List.objects.filter(status='active', app=app)
+    lists = List.objects.filter(status='active', app=app).order_by('name',)
 
     if request.is_ajax() and request.method == "GET":
 
