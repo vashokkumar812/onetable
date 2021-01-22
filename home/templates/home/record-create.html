@@ -40,7 +40,7 @@
               {% elif field.field_type == 'choose-from-list' %}
               <div class="form-group">
                 <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
-                <select class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" data-attr="{{field.field_type}}">
+                <select class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" data-attr="{{field.field_type}}" {% if field.required %}required{% endif %}>
                   {% for id, data in field.select_record %}
                   <option value="{{id}}" data-value="{{data}}">{{data}}</option>
                   {% endfor %}
@@ -59,22 +59,40 @@
 
 <!-- Include JS here that needs template tags -->
 <script>
+  $('.record-field').on('focusin', function(){
+    $(this).removeClass('border-danger');
+  });
+
   function saveRecord() {
     // Get the values from the form
     var field_values = [];
+    var submit = 0;
+    var required = 0;
+
     $(".record-field").each(function(){
-     var id = $(this).attr('id').replace("field_","");
-     var val = $(this).val();
-     var field_type = $(this).attr('data-attr');
-     field = {};
-     field['fieldId'] = id;
-     field['fieldValue'] = val;
-     field['fieldType'] = field_type;
-     if (field_type === "choose-from-list"){
-      field['selectListValue'] = $(this).find(':selected').data('value');
-     }
-     field_values.push(field);
+      if ($(this).is(':required')){
+        required += 1;
+        if ($(this).val().length !== 0){
+          submit += 1;
+        }
+        else{
+          $(this).addClass('border-danger');
+        }
+      };
+      
+      var id = $(this).attr('id').replace("field_","");
+      var val = $(this).val();
+      var field_type = $(this).attr('data-attr');
+      field = {};
+      field['fieldId'] = id;
+      field['fieldValue'] = val;
+      field['fieldType'] = field_type;
+      if (field_type === "choose-from-list"){
+        field['selectListValue'] = $(this).find(':selected').data('value');
+      }
+      field_values.push(field);
     });
+
     const data = {
       'field_values': JSON.stringify(field_values),
       'csrfmiddlewaretoken': window.CSRF_TOKEN // from index.html
@@ -83,23 +101,26 @@
     if (record) {
       data.record_id = record;
     }
-    $.ajax({
-      type: "POST",
-      dataType: 'json',
-      url: "{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}",
-      data: data,
-      success: function(data) {
-        if (data.success) {
-          window.location.href = "{% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}";
-            // Go to the record page here
-        } else {
-          alert("There was an error, please try again!");
+    
+    if (submit === required){
+      $.ajax({
+        type: "POST",
+        dataType: 'json',
+        url: "{% url 'save_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}",
+        data: data,
+        success: function(data) {
+          if (data.success) {
+            window.location.href = "{% url 'list' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk %}";
+              // Go to the record page here
+          } else {
+            alert("There was an error, please try again!");
+          }
+        },
+        error: function(xhr, status, error) {
+          console.log(xhr, status, error);
+          // shit happens friends!
         }
-      },
-      error: function(xhr, status, error) {
-        console.log(xhr, status, error);
-            // shit happens friends!
-      }
-    });
+      });
+    }
   };
 </script>

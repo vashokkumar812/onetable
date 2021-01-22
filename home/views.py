@@ -490,7 +490,7 @@ def create_list(request, organization_pk, app_pk):
     elif request.method == 'POST':
         listform = ListForm(request.POST)
         formset = ListFieldFormset(request.POST)
-        
+
         # Verify the form submitted is valid
         if listform.is_valid() and formset.is_valid():
             list = listform.save(commit=False)
@@ -522,18 +522,18 @@ def create_list(request, organization_pk, app_pk):
                     if form.cleaned_data.get('select_list') is not None:
                         if int(select_list_id) != int(form.cleaned_data.get('select_list').id):
                             ListField.objects.create(
-                                created_at=timezone.now(), created_user=request.user, list=list, field_label=request.POST[f'form-{index}-field_label'], field_type=request.POST[f'form-{index}-field_type'], select_list_id=int(select_list_id, order=list_field_order)
+                                created_at=timezone.now(), created_user=request.user, list=list, field_label=request.POST[f'form-{index}-field_label'], field_type=request.POST[f'form-{index}-field_type'], select_list_id=int(select_list_id), order=list_field_order
                             )
                             list_field_order += 1
                             change_from_select_list = True
-                
+
                 if change_from_select_list is False:
                     list_field_order += 1
-                
+
             return redirect('lists', organization_pk=organization_pk, app_pk=app_pk)
         else:
             print(formset.errors)
-    
+
     context={
         'organization': organization,
         'app': app,
@@ -587,7 +587,7 @@ def edit_list(request, organization_pk, app_pk, list_pk):
                     list_field.created_user = request.user
                     list_field.order = list_field_order
                     list_field.save()
-            
+
                     list_field_order += 1
 
             remove_list_field_ids = request.POST.getlist('delete_list_field_ids')
@@ -875,7 +875,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                         if field['fieldType'] == "choose-from-list":
                            record_field.selected_record_id = field['fieldValue']
                            record_field.value = field['selectListValue']
-                        else: 
+                        else:
                             record_field.value = field['fieldValue']
                         record_field.last_updated = timezone.now()
                         record_field.save()
@@ -895,7 +895,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                                 created_at=timezone.now(),
                                 created_user=request.user)
                             record_field.save()
-                            
+
                             if field['fieldType'] == "choose-from-list":
                                 record_field.selected_record_id = field['fieldValue']
                                 record_field.value = field['selectListValue']
@@ -920,7 +920,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             created_at=timezone.now(),
                             created_user=request.user)
                         record_field.save()
-                        
+
                         if field['fieldType'] == "choose-from-list":
                             record_field.selected_record_id = field['fieldValue']
                             record_field.value = field['selectListValue']
@@ -950,6 +950,7 @@ def record(request, organization_pk, app_pk, list_pk, record_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
     record = get_object_or_404(Record, pk=record_pk)
+    print(record.list.pk)
 
     if request.is_ajax() and request.method == "GET":
 
@@ -1153,6 +1154,7 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
 
         fields.append(field_object)
     fields.reverse()
+
     if request.is_ajax() and request.method == "GET":
 
         # Call is ajax, just load main content needed here
@@ -1189,6 +1191,13 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
 
 
 # TODO need view for archiving records
+def archive_record(request, organization_pk, app_pk, list_pk, record_pk):
+    #   this functional is call when user click on the "Archive Record" button on Record Detail Page
+    record = get_object_or_404(Record, pk=record_pk)
+    record.status = "archived"
+    record.last_updated = timezone.now()
+    record.save()
+    return redirect('list', organization_pk=organization_pk, app_pk=app_pk, list_pk=list_pk)
 
 # TODO need view for create task, edit task, archive task, get tasks (will use
 # standard django forms for this)
