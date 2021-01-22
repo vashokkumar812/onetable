@@ -512,6 +512,7 @@ def create_list(request, organization_pk, app_pk):
                     list_field.primary = True
                     list_field.required = True
                     list_field.visible = True
+
                 list_field.save()
                 list_field.field_id = list_field.id
                 list_field.save()
@@ -584,6 +585,10 @@ def edit_list(request, organization_pk, app_pk, list_pk):
                     list_field.updated_at = timezone.now()
                     list_field.created_user = request.user
                     list_field.order = list_field_order
+                    if list_field.order == 0:
+                        list_field.primary = True
+                        list_field.required = True
+                        list_field.visible = True
                     list_field.save()
 
                     list_field_order += 1
@@ -611,124 +616,6 @@ def edit_list(request, organization_pk, app_pk, list_pk):
 
     return render(request, 'home/workspace.html', context=context)
 
-
-
-
-@login_required
-def save_list(request, organization_pk, app_pk):
-
-    # TODO Implement django formset here and replace below
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-
-    if request.is_ajax and request.method == "POST":
-
-        list_name = request.POST.get('list_name', None)
-
-        field_list = json.loads(request.POST['fields'])
-
-        list = List.objects.create(
-            name=list_name,
-            app=app,
-            status='active',
-            created_at=timezone.now(),
-            created_user=request.user)
-        list.save()
-
-        for field in field_list:
-            list_field = ListField.objects.create(
-                list=list,
-                field_id=field['id'],
-                field_label=field['fieldLabel'],
-                field_type=field['fieldType'],
-                required=field['required'],
-                visible=field['visible'],
-                primary=field['primary'],
-                order=field['order'],
-                status='active',
-                created_at=timezone.now(),
-                created_user=request.user)
-
-            # Add the embedded list here if embedded list type
-            if field['fieldType'] == 'choose-from-list' or field['fieldType'] == 'choose-multiple-from-list':
-                # Look up the field list
-                list = get_object_or_404(List, pk=field['fieldList'])
-                list_field.select_list=list
-
-            list_field.save()
-
-        # Redirect based on ajax call from frontend on success
-
-        # TODO Need error handling here for fail
-        data_dict = {"success": True}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-@login_required
-def update_list(request, organization_pk, app_pk, list_pk):
-
-    # TODO Implement django formset here and replace below
-
-    # TODO combine with save_list above to consolidate
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-    list = get_object_or_404(List, pk=list_pk)
-
-    if request.is_ajax and request.method == "POST":
-
-        list_name = request.POST.get('list_name', None)
-        if list_name is not list.name:
-            list.name=list_name
-            list.save()
-
-        field_list = json.loads(request.POST['fields'])
-        removed_fields = json.loads(request.POST['removed'])
-
-        # Loop through and update or add the fields
-        for field in field_list:
-            try:
-                list_field = ListField.objects.get(status='active', field_id=field['id'], list=list)
-                # Update the old list field database record
-                list_field.field_label = field['fieldLabel']
-                list_field.fieldType = field['fieldType']
-                list_field.required = field['required']
-                list_field.visible = field['visible']
-                list_field.primary = field['primary']
-                list_field.order = field['order']
-                list_field.save()
-            except ListField.DoesNotExist:
-                # Create a new list field in the database
-                list_field = ListField.objects.create(
-                    list=list,
-                    field_id=field['id'],
-                    field_label=field['fieldLabel'],
-                    field_type=field['fieldType'],
-                    required=field['required'],
-                    visible=field['visible'],
-                    primary=field['primary'],
-                    order=field['order'],
-                    status='active',
-                    created_at=timezone.now(),
-                    created_user=request.user)
-                list_field.save()
-
-        for field_id in removed_fields:
-            try:
-                list_field = ListField.objects.get(status='active', field_id=field_id, list=list)
-                list_field.status = "deleted"
-                list_field.save()
-            except ListField.DoesNotExist:
-                # Do nothing - field already removed somehow
-                pass
-
-        # Redirect based on ajax call from frontend on success
-
-        # TODO Need error handling here for fail
-        data_dict = {"success": True}
-
-        return JsonResponse(data=data_dict, safe=False)
 
 @login_required
 def archive_list(request, organization_pk, app_pk, list_pk):
