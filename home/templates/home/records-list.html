@@ -14,7 +14,7 @@
                           <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="list"></i></div>
                           Edit Record
                       </a>
-                      <a class="dropdown-item" href="#">
+                      <a class="dropdown-item" href="{% url 'archive_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=record.pk %}">
                           <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="list"></i></div>
                           Archive Record
                       </a>

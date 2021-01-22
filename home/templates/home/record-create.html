@@ -79,7 +79,7 @@
           $(this).addClass('border-danger');
         }
       };
-      
+
       var id = $(this).attr('id').replace("field_","");
       var val = $(this).val();
       var field_type = $(this).attr('data-attr');
@@ -101,7 +101,7 @@
     if (record) {
       data.record_id = record;
     }
-    
+
     if (submit === required){
       $.ajax({
         type: "POST",
