@@ -192,8 +192,8 @@ class ListField(models.Model):
         ('text', 'Text'),
         ('long-text', 'Long Text'),
         ('number', 'Number'),
-        ('choose-from-list', 'Choose from List'), 
-        ('choose-multiple-from-list', 'Choose multiple from List'),
+        ('choose-from-list', 'Choose from List'),
+        #('choose-multiple-from-list', 'Choose multiple from List'),
     )
 
     field_type = models.CharField(
@@ -227,7 +227,7 @@ class ListField(models.Model):
 
     def __str__(self):
         return self.field_label
- 
+
     def save(self, *args, **kwargs):
         self.field_id = str(self.id)
         super(ListField, self).save(*args, **kwargs)
@@ -264,7 +264,7 @@ class Record(models.Model):
             .select_related('record__list', 'record__created_user') \
             .select_related('created_user') \
             .get(record=self)
-        
+
     def __str__(self):
         return str(self.id)
 
