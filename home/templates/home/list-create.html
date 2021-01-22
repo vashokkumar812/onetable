@@ -199,11 +199,9 @@
   });
 
   /* code for remove the list field */
-  $(document).on('click', '.remove-list-field', () => {
-
+  $(document).on('click', '.remove-list-field', function(){
     const type = "{{ type | safe }}";
     if (type == "edit-list") {
-
       var initial_form_id = $(this).attr('data-attr');
       if (initial_form_id !== "None") {
         var list_field_id = $(this).parent('div').parent('div').parent('div').parent('div').prev('input').val();
@@ -212,11 +210,9 @@
         );
       };
     }
-
     const totalForms = $("#id_form-TOTAL_FORMS").val();
     $("#id_form-TOTAL_FORMS").val(Number(totalForms)-1);
     $(this).parent('div').parent('div').parent('div').parent('div').hide();
-    
   });
 
   /* code for Up Arrow Functionality with changing the id, name attribute value */
