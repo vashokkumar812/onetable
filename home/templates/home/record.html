@@ -22,7 +22,6 @@
   <hr class="mt-0 mb-4" />
   <div id="record-view-content">
 
-
       {% block recorddetailscontent %}
         {% if record_view == 'record-details' %}
           {% include 'home/record-details.html' %}
@@ -49,25 +48,25 @@
   const showActiveLink = (record_view) => {
     if (record_view === 'record-details') {
       // Activate details link
-      $('#record-details-link').addClass("active ml-0")
-      $('#record-notes-link').removeClass("active ml-0")
-      $('#record-tasks-link').removeClass("active ml-0")
+      $('#record-details-link').addClass("active")
+      $('#record-notes-link').removeClass("active")
+      $('#record-tasks-link').removeClass("active")
     } else if (record_view === 'record-notes') {
       // Activate notes link
-      $('#record-details-link').removeClass("active ml-0")
-      $('#record-notes-link').addClass("active ml-0")
-      $('#record-tasks-link').removeClass("active ml-0")
+      $('#record-details-link').removeClass("active")
+      $('#record-notes-link').addClass("active")
+      $('#record-tasks-link').removeClass("active")
     } else if (record_view == 'record-tasks') {
       // Activate tasks link
-      $('#record-details-link').removeClass("active ml-0")
-      $('#record-notes-link').removeClass("active ml-0")
-      $('#record-tasks-link').addClass("active ml-0")
+      $('#record-details-link').removeClass("active")
+      $('#record-notes-link').removeClass("active")
+      $('#record-tasks-link').addClass("active")
     } else {
       // Load default details
       // Activate details link
-      $('#record-details-link').addClass("active ml-0")
-      $('#record-notes-link').removeClass("active ml-0")
-      $('#record-tasks-link').removeClass("active ml-0")
+      $('#record-details-link').addClass("active")
+      $('#record-notes-link').removeClass("active")
+      $('#record-tasks-link').removeClass("active")
     }
   }
 
@@ -79,11 +78,11 @@
     $('#record-details-link').click(() => {
       showActiveLink('record-details')
     })
-  
+
     $('#record-notes-link').click(() => {
       showActiveLink('record-notes')
     })
-  
+
     $('#record-tasks-link').click(() => {
       showActiveLink('record-tasks')
     })
