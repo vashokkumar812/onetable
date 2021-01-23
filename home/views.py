@@ -1048,6 +1048,52 @@ def record_tasks(request, organization_pk, app_pk, list_pk, record_pk):
         return render(request, 'home/workspace.html', context=context)
 
 @login_required
+def record_links(request, organization_pk, app_pk, list_pk, record_pk):
+
+    # Record details page (placeholder for now)
+    record = get_object_or_404(Record, pk=record_pk)
+    record_relations = RecordRelation.objects.all().filter(status='active', child_record=record)
+    records = []
+    for relation in record_relations:
+        records.append(relation.parent_record)
+
+    if request.is_ajax() and request.method == "GET":
+
+        # Call is ajax, just load main content needed here
+
+        html = render_to_string(
+            template_name="home/record-links.html",
+            context={
+                'record': record,
+                'records': records
+
+            }
+        )
+
+        data_dict = {"html_from_view": html}
+
+        return JsonResponse(data=data_dict, safe=False)
+
+    else:
+
+        # If accessing the url directly, load full page
+        organization = get_object_or_404(Organization, pk=organization_pk)
+        app = get_object_or_404(App, pk=app_pk)
+        list = get_object_or_404(List, pk=list_pk)
+
+        context = {
+            'organization': organization,
+            'app': app,
+            'list': list,
+            'record': record,
+            'records': records,
+            'type': 'record',
+            'record_view': 'record-links'
+        }
+
+        return render(request, 'home/workspace.html', context=context)
+
+@login_required
 def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
 
     organization = get_object_or_404(Organization, pk=organization_pk)
