@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.utils import timezone
 from django.db.models import JSONField
+from tinymce.models import HTMLField
 
 
 class Organization(models.Model):
@@ -331,3 +332,49 @@ class RecordRelation(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class Task(models.Model):
+    task = HTMLField()
+    record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    TASK_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=TASK_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return self.name
+
+class Note(models.Model):
+    note = HTMLField()
+    record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    NOTE_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=NOTE_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return self.name

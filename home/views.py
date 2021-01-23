@@ -12,7 +12,7 @@ import random
 import string
 
 from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField, RecordRelation
-from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset
+from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset, TaskForm, NoteForm
 
 # TODO
 # On all views, @login_required prevents users not logged in, but need method and
@@ -352,41 +352,6 @@ def tasks(request, organization_pk, app_pk):
         return render(request, 'home/workspace.html', context=context)
 
 
-@login_required
-def notes(request, organization_pk, app_pk):
-
-    organization = get_object_or_404(Organization, pk=organization_pk)
-    app = get_object_or_404(App, pk=app_pk)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/notes.html",
-            context={
-                'organization': organization,
-                'app': app
-            }
-        )
-
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    else:
-
-        # If accessing the url directly, load full page
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'type': 'notes'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
-
-
 #===============================================================================
 # Lists
 #===============================================================================
@@ -573,8 +538,6 @@ def edit_list(request, organization_pk, app_pk, list_pk):
     elif request.method == 'POST':
         listform = ListForm(request.POST, instance=list)
         formset = ListFieldFormset(data=request.POST)
-
-        print(request.POST)
 
         # Verify the form submitted is valid
         if listform.is_valid() and formset.is_valid():
@@ -928,6 +891,7 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
     app = get_object_or_404(App, pk=app_pk)
     list = get_object_or_404(List, pk=list_pk)
     record = get_object_or_404(Record, pk=record_pk)
+    note_form = NoteForm()
 
     if request.is_ajax() and request.method == "GET":
 
@@ -939,7 +903,8 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
                 'organization': organization,
                 'app': app,
                 'list': list,
-                'record': record
+                'record': record,
+                'note_form': note_form
 
             }
         )
@@ -950,7 +915,7 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
 
     # TODO add access here for direct link
     # For now just return record details
-    else:
+    if request.method == "GET":
 
         # If accessing the url directly, load full page
 
@@ -959,60 +924,41 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
             'app': app,
             'list': list,
             'record': record,
+            'note_form': note_form,
             'type': 'record',
             'record_view': 'record-details'
         }
 
         return render(request, 'home/workspace.html', context=context)
 
-@login_required
-def record_notes(request, organization_pk, app_pk, list_pk, record_pk):
+    if request.method == "POST":
+        form = NoteForm(request.POST)
+        if form.is_valid():
 
-    # Record details page (placeholder for now)
+            # Save the new project
+            note = form.save()
 
-    record = get_object_or_404(Record, pk=record_pk)
-
-    if request.is_ajax() and request.method == "GET":
-
-        # Call is ajax, just load main content needed here
-
-        html = render_to_string(
-            template_name="home/record-notes.html",
-            context={
-                'record': record
-
+            context = {
+                'organization': organization,
+                'app': app,
+                'list': list,
+                'record': record,
+                'note_form': note_form,
+                'type': 'record',
+                'record_view': 'record-details'
             }
-        )
 
-        data_dict = {"html_from_view": html}
-
-        return JsonResponse(data=data_dict, safe=False)
-
-    # TODO add access here for direct link
-    # For now just return record details
-    else:
-
-        # If accessing the url directly, load full page
-        organization = get_object_or_404(Organization, pk=organization_pk)
-        app = get_object_or_404(App, pk=app_pk)
-        list = get_object_or_404(List, pk=list_pk)
-
-        context = {
-            'organization': organization,
-            'app': app,
-            'list': list,
-            'record': record,
-            'type': 'record',
-            'record_view': 'record-notes'
-        }
-
-        return render(request, 'home/workspace.html', context=context)
+            return render(request, 'home/workspace.html', context=context)
 
 @login_required
 def record_tasks(request, organization_pk, app_pk, list_pk, record_pk):
 
     # Record details page (placeholder for now)
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
     record = get_object_or_404(Record, pk=record_pk)
+    task_form = TaskForm()
 
     if request.is_ajax() and request.method == "GET":
 
@@ -1021,7 +967,8 @@ def record_tasks(request, organization_pk, app_pk, list_pk, record_pk):
         html = render_to_string(
             template_name="home/record-tasks.html",
             context={
-                'record': record
+                'record': record,
+                'task_form': task_form
             }
         )
 
@@ -1032,15 +979,13 @@ def record_tasks(request, organization_pk, app_pk, list_pk, record_pk):
     else:
 
         # If accessing the url directly, load full page
-        organization = get_object_or_404(Organization, pk=organization_pk)
-        app = get_object_or_404(App, pk=app_pk)
-        list = get_object_or_404(List, pk=list_pk)
 
         context = {
             'organization': organization,
             'app': app,
             'list': list,
             'record': record,
+            'task_form': task_form,
             'type': 'record',
             'record_view': 'record-tasks'
         }
@@ -1049,6 +994,10 @@ def record_tasks(request, organization_pk, app_pk, list_pk, record_pk):
 
 @login_required
 def record_links(request, organization_pk, app_pk, list_pk, record_pk):
+
+    organization = get_object_or_404(Organization, pk=organization_pk)
+    app = get_object_or_404(App, pk=app_pk)
+    list = get_object_or_404(List, pk=list_pk)
 
     # Record details page (placeholder for now)
     record = get_object_or_404(Record, pk=record_pk)
@@ -1064,6 +1013,9 @@ def record_links(request, organization_pk, app_pk, list_pk, record_pk):
         html = render_to_string(
             template_name="home/record-links.html",
             context={
+                'organization': organization,
+                'app': app,
+                'list': list,
                 'record': record,
                 'records': records
 
@@ -1077,9 +1029,6 @@ def record_links(request, organization_pk, app_pk, list_pk, record_pk):
     else:
 
         # If accessing the url directly, load full page
-        organization = get_object_or_404(Organization, pk=organization_pk)
-        app = get_object_or_404(App, pk=app_pk)
-        list = get_object_or_404(List, pk=list_pk)
 
         context = {
             'organization': organization,
@@ -1168,7 +1117,6 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
         }
 
         return render(request, 'home/workspace.html', context=context)
-
 
 # TODO need view for archiving records
 def archive_record(request, organization_pk, app_pk, list_pk, record_pk):

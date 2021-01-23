@@ -26,7 +26,14 @@
             {% for field in record.record_fields %}
               {% if field.list_field.visible and field.list_field.primary is False %}
                 {% if field.list_field.field_type == "choose-from-list" %}
-                  <p><b>{{ field.list_field.field_label }}:</b> <a href="{% url 'record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=field.selected_record.pk %}"><span class="badge badge-primary p-2">{{ field.value }}</span></a></p>
+                <p><b>{{ field.list_field.field_label }}:</b>
+                  {% if field.selected_record.status == 'active' %}
+                  <a href="{% url 'record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=field.selected_record.pk %}">
+                    <span class="badge badge-primary p-2">{{ field.selected_record.primary_field.value }}
+                    </span>
+                  </a>
+                  {% endif %}
+                </p>
                 {% elif field.list_field.field_type == "url" %}
                   <p><b>{{ field.list_field.field_label }}:</b> <a href="{{ field.value }}" target="_blank">{{ field.value }}</a></p>
                 {% else %}
