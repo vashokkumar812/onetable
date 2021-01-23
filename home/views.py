@@ -11,7 +11,7 @@ import uuid
 import random
 import string
 
-from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField
+from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField, RecordRelation
 from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset
 
 # TODO
@@ -521,8 +521,15 @@ def create_list(request, organization_pk, app_pk):
                     if form.cleaned_data.get('select_list') is not None:
                         if int(select_list_id) != int(form.cleaned_data.get('select_list').id):
                             ListField.objects.create(
-                                created_at=timezone.now(), created_user=request.user, list=list, field_label=request.POST[f'form-{index}-field_label'], field_type=request.POST[f'form-{index}-field_type'], select_list_id=int(select_list_id), order=list_field_order
+                                created_at=timezone.now(),
+                                created_user=request.user,
+                                list=list,
+                                field_label=request.POST[f'form-{index}-field_label'],
+                                field_type=request.POST[f'form-{index}-field_type'],
+                                select_list_id=int(select_list_id),
+                                order=list_field_order
                             )
+
                             list_field_order += 1
                             change_from_select_list = True
 
@@ -753,6 +760,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                 if record_id is not None:
                     try:
                         # Update existing record field
+                        # TODO only update if the value changed
                         record_field = RecordField.objects.get(status='active', list_field__field_id=field['fieldId'], record=record)
                         if field['fieldType'] == "choose-from-list":
                            record_field.selected_record_id = field['fieldValue']
@@ -761,14 +769,33 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             record_field.value = field['fieldValue']
                         record_field.save()
 
+                        # Update existing relationship
+                        if field['fieldType'] == "choose-from-list":
+                            try:
+                                record_relation = RecordRelation.objects.get(status='active', list_field__field_id=field['fieldId'], parent_record=record)
+                                record_relation.child_record_id = field['fieldValue']
+                                record_relation.save()
+                            except RecordRelation.DoesNotExist:
+                                # Create the record relation / does not exist
+                                record_relation = RecordRelation.objects.create(
+                                    parent_record=record,
+                                    child_record_id=record_field.selected_record_id,
+                                    relation_type='choose-from-list',
+                                    list_field=record_field.list_field,
+                                    status='active',
+                                    created_at=timezone.now(),
+                                    created_user=request.user)
+                                record_relation.save()
+
                     except RecordField.DoesNotExist:
 
                         # This record field has not been saved before, so create it
-                        # Note this is redundant with below / can be consolidated eventually
+                        # TODO this is redundant with below / can be consolidated eventually
                         try:
 
                             list_field = ListField.objects.get(status='active', field_id=field['fieldId'], list=list)
 
+                            # Create the new record field
                             record_field = RecordField.objects.create(
                                 record=record,
                                 list_field=list_field,
@@ -783,6 +810,19 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             else:
                                 record_field.value = field['fieldValue']
                             record_field.save()
+
+                            # Create the record relation if select from list
+                            if field['fieldType'] == "choose-from-list":
+                                record_relation = RecordRelation.objects.create(
+                                    parent_record=record,
+                                    child_record_id=record_field.selected_record_id,
+                                    relation_type='choose-from-list',
+                                    list_field=record_field.list_field,
+                                    status='active',
+                                    created_at=timezone.now(),
+                                    created_user=request.user)
+                                record_relation.save()
+
                         except ListField.DoesNotExist:
                             # Easy error handling for now
                             pass
@@ -808,6 +848,19 @@ def save_record(request, organization_pk, app_pk, list_pk):
                         else:
                             record_field.value = field['fieldValue']
                         record_field.save()
+
+                        # Create the record relation if select from list
+                        if field['fieldType'] == "choose-from-list":
+                            record_relation = RecordRelation.objects.create(
+                                parent_record=record,
+                                child_record_id=record_field.selected_record_id,
+                                relation_type='choose-from-list',
+                                list_field=record_field.list_field,
+                                status='active',
+                                created_at=timezone.now(),
+                                created_user=request.user)
+                            record_relation.save()
+
                     except ListField.DoesNotExist:
                         # Easy error handling for now
                         pass

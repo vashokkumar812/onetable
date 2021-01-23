@@ -273,7 +273,7 @@ class Record(models.Model):
 class RecordField(models.Model):
     record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='record')
     list_field = models.ForeignKey('ListField', on_delete=models.SET_NULL, null=True)
-    value = models.TextField()
+    value = models.TextField(null=True)
     selected_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='selected_record')
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
@@ -288,6 +288,43 @@ class RecordField(models.Model):
     status = models.CharField(
         max_length=25,
         choices=RECORD_FIELD_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return str(self.id)
+
+class RecordRelation(models.Model):
+    parent_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='parent_record')
+    child_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='child_record')
+    list_field = models.ForeignKey('ListField', on_delete=models.SET_NULL, null=True, related_name='list_field')
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    RECORD_RELATION_TYPE = (
+        ('choose-from-list', 'Choose from list'),
+        ('embed', 'Embed'),
+        ('tag', 'Tag'),
+    )
+
+    relation_type = models.CharField(
+        max_length=25,
+        choices=RECORD_RELATION_TYPE,
+        blank=False,
+        default='active',
+    )
+
+    RECORD_RELATION_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=RECORD_RELATION_STATUS,
         blank=False,
         default='active',
     )
