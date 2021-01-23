@@ -22,7 +22,7 @@
       <div class="sbp-preview-content">
         <form id="record-form">{% csrf_token %}
             {% for field in fields %}
-              {% if field.field_type == 'text' %}
+              {% if field.field_type == 'text' or field.field_type == 'url' %}
                 <div class="form-group">
                   <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
                   <input class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" data-attr="{{field.field_type}}" type="text" placeholder="Input response here" {% if field.value %}value='{{ field.value }}'{% endif %} {% if field.required %}required{% endif %}>

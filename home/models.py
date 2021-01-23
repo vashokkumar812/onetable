@@ -192,6 +192,7 @@ class ListField(models.Model):
         ('text', 'Text'),
         ('long-text', 'Long Text'),
         ('number', 'Number'),
+        ('url', 'Url'),
         ('choose-from-list', 'Choose from List'),
         #('choose-multiple-from-list', 'Choose multiple from List'),
     )

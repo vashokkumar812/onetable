@@ -21,23 +21,21 @@
                   </div>
               </div>
           </div>
+          {% if record.record_fields|length > 1 %}
           <div class="card-body">
-            {% if record.record_fields %}
-              {% for field in record.record_fields %}
-                {% if field.list_field.visible and field.list_field.primary is False %}
-                  {% if field.list_field.field_type == "choose-from-list" %}
-                    {% if field.selected_record %}
-                      <p>{{ field.list_field.field_label }}: <a href="{% url 'record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=field.selected_record.pk %}"><span class="badge badge-primary">{{ field.selected_record.primary_field.value }}</span></a></p>
-                    {% else %}
-                      {# this is an error and missing value #}
-                    {% endif %}
-                  {% else %}
-                    <p>{{ field.list_field.field_label }}: {{ field.value }}</p>
-                  {% endif %}
+            {% for field in record.record_fields %}
+              {% if field.list_field.visible and field.list_field.primary is False %}
+                {% if field.list_field.field_type == "choose-from-list" %}
+                  <p><b>{{ field.list_field.field_label }}:</b> <a href="{% url 'record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=field.selected_record.pk %}"><span class="badge badge-primary p-2">{{ field.value }}</span></a></p>
+                {% elif field.list_field.field_type == "url" %}
+                  <p><b>{{ field.list_field.field_label }}:</b> <a href="{{ field.value }}" target="_blank">{{ field.value }}</a></p>
+                {% else %}
+                  <p><b>{{ field.list_field.field_label }}:</b> {{ field.value }}</p>
                 {% endif %}
-              {% endfor %}
-            {% endif %}
+              {% endif %}
+            {% endfor %}
           </div>
+          {% endif %}
       </div>
     </div>
   {% endfor %}
