@@ -296,10 +296,7 @@ class RecordField(models.Model):
     def __str__(self):
         return str(self.id)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 87c88ae9246ef56bf51345e17fd0d83dd56efa23
 class RecordRelation(models.Model):
     parent_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='parent_record')
     child_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='child_record')
@@ -337,10 +334,7 @@ class RecordRelation(models.Model):
     def __str__(self):
         return str(self.id)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 87c88ae9246ef56bf51345e17fd0d83dd56efa23
 class Task(models.Model):
     task = HTMLField()
     record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)
@@ -364,10 +358,7 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 87c88ae9246ef56bf51345e17fd0d83dd56efa23
 class Note(models.Model):
     note = HTMLField()
     record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)

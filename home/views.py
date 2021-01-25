@@ -757,11 +757,6 @@ def save_record(request, organization_pk, app_pk, list_pk):
                                     created_at=timezone.now(),
                                     created_user=request.user)
                                 record_relation.save()
-<<<<<<< HEAD
-
-                    except RecordField.DoesNotExist:
-=======
->>>>>>> 87c88ae9246ef56bf51345e17fd0d83dd56efa23
 
                     except RecordField.DoesNotExist:
                         print('=================in execpt')
