@@ -41,8 +41,19 @@
               <div class="form-group">
                 <label for="field_{{ field.field_id }}">{{ field.field_label }}{% if field.required %}*{% endif %}</label>
                 <select class="form-control form-control-solid record-field" id="field_{{ field.field_id }}" data-attr="{{field.field_type}}" {% if field.required %}required{% endif %}>
+                  {% if field.value %}
                   {% for id, data in field.select_record %}
+                  {% if field.value == data %}
                   <option value="{{id}}" data-value="{{data}}">{{data}}</option>
+                  {% endif %}
+                  {% endfor %}
+                  {% else %}
+                  <option value="">------</option>
+                  {% endif %}
+                  {% for id, data in field.select_record %}
+                  {% if field.value != data %}
+                  <option value="{{id}}" data-value="{{data}}">{{data}}</option>
+                  {% endif %}
                   {% endfor %}
                 </select>
               </div>
@@ -87,7 +98,13 @@
       field['fieldValue'] = val;
       field['fieldType'] = field_type;
       if (field_type === "choose-from-list"){
-        field['selectListValue'] = $(this).find(':selected').data('value');
+        var listValue = $(this).find(':selected').data('value');
+        if (typeof listValue === "undefined"){
+          field['selectListValue'] = false;
+        }
+        else{
+          field['selectListValue'] = listValue;
+        }
       }
       field_values.push(field);
     });
@@ -100,7 +117,12 @@
     if (record) {
       data.record_id = record;
     }
+<<<<<<< HEAD
 
+=======
+    console.log('=============record_id', record);
+    console.log('=============data', data);
+>>>>>>> 87c88ae9246ef56bf51345e17fd0d83dd56efa23
     if (submit === required){
       $.ajax({
         type: "POST",

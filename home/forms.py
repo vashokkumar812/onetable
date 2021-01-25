@@ -50,7 +50,8 @@ ListFieldFormset = modelformset_factory(
     widgets = {
         'field_label': forms.TextInput(attrs={
             'class': 'form-control form-control-solid py-1',
-            'placeholder': 'Enter a label for this field'
+            'placeholder': 'Enter a label for this field',
+            'required': '',
             }
         ),
         'field_type': forms.Select(attrs={

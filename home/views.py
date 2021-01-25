@@ -652,7 +652,7 @@ def add_record(request, organization_pk, app_pk, list_pk):
         field_object['order'] = list_field.order
         field_object['id'] = list_field.id
         if list_field.field_type == "choose-from-list":
-            field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active").values_list('record', 'value')
+            field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active", list_field__primary=True).values_list('record', 'value')
         fields.append(field_object)
     fields.reverse()
 
@@ -699,14 +699,19 @@ def save_record(request, organization_pk, app_pk, list_pk):
     record_id = request.POST.get('record_id', None)
     fields = json.loads(request.POST['field_values'])
 
+    print('==========================record id', record_id)
+    print('==========================fields', fields)
+
     # TODO
     # Needs error handling here verify if the form is valid (i.e. all required fields, acceptable data types, etc)
 
     record = None # Create object globally outside of the if/else
 
     if record_id is not None:
+        print('=================here')
         # Get the existing record / this is a record being edited
         record = get_object_or_404(Record, pk=record_id)
+        print('==============record', record)
     else:
         # Add a new record
         record = Record.objects.create(
@@ -717,11 +722,14 @@ def save_record(request, organization_pk, app_pk, list_pk):
         record.save()
 
     for field in fields:
-            if field['fieldValue'] is not None:
+            print('============================field', field)
+            if field['fieldValue']:
+            # if field['fieldValue'] is not None:
                 # Only save a RecordField object if there is a value
 
                 if record_id is not None:
                     try:
+                        print('==================in try')
                         # Update existing record field
                         # TODO only update if the value changed
                         record_field = RecordField.objects.get(status='active', list_field__field_id=field['fieldId'], record=record)
@@ -749,9 +757,14 @@ def save_record(request, organization_pk, app_pk, list_pk):
                                     created_at=timezone.now(),
                                     created_user=request.user)
                                 record_relation.save()
+<<<<<<< HEAD
 
                     except RecordField.DoesNotExist:
+=======
+>>>>>>> 87c88ae9246ef56bf51345e17fd0d83dd56efa23
 
+                    except RecordField.DoesNotExist:
+                        print('=================in execpt')
                         # This record field has not been saved before, so create it
                         # TODO this is redundant with below / can be consolidated eventually
                         try:
@@ -791,6 +804,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
                             pass
 
                 else:
+
                     try:
 
                         # Create new record field
@@ -1075,7 +1089,11 @@ def edit_record(request, organization_pk, app_pk, list_pk, record_pk):
         field_object['order'] = list_field.order
         # Get the field value if it exists
         if list_field.field_type == "choose-from-list":
-            field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active").values_list('record', 'value')
+            field_object['select_record'] = RecordField.objects.filter(record__list=list_field.select_list.id, record__status="active", status="active", list_field__primary=True).values_list('record', 'value')
+            try:
+                field_object['value'] = RecordField.objects.get(record_id=record_pk, list_field_id=list_field.id, status="active").value
+            except:
+                pass
         else:
             for record_field in record.record_fields:
                 if list_field.id == record_field.list_field.id:
