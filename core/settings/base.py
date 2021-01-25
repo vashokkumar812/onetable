@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'accounts',
     'home',
 
+    'tinymce',
+
 ]
 
 MIDDLEWARE = [

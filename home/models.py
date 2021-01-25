@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.utils import timezone
 from django.db.models import JSONField
+from tinymce.models import HTMLField
 
 
 class Organization(models.Model):
@@ -192,8 +193,9 @@ class ListField(models.Model):
         ('text', 'Text'),
         ('long-text', 'Long Text'),
         ('number', 'Number'),
-        ('choose-from-list', 'Choose from List'), 
-        ('choose-multiple-from-list', 'Choose multiple from List'),
+        ('url', 'Url'),
+        ('choose-from-list', 'Choose from List'),
+        #('choose-multiple-from-list', 'Choose multiple from List'),
     )
 
     field_type = models.CharField(
@@ -227,7 +229,7 @@ class ListField(models.Model):
 
     def __str__(self):
         return self.field_label
- 
+
     def save(self, *args, **kwargs):
         self.field_id = str(self.id)
         super(ListField, self).save(*args, **kwargs)
@@ -264,7 +266,7 @@ class Record(models.Model):
             .select_related('record__list', 'record__created_user') \
             .select_related('created_user') \
             .get(record=self)
-        
+
     def __str__(self):
         return str(self.id)
 
@@ -272,7 +274,7 @@ class Record(models.Model):
 class RecordField(models.Model):
     record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='record')
     list_field = models.ForeignKey('ListField', on_delete=models.SET_NULL, null=True)
-    value = models.TextField()
+    value = models.TextField(null=True)
     selected_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='selected_record')
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
@@ -293,3 +295,89 @@ class RecordField(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class RecordRelation(models.Model):
+    parent_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='parent_record')
+    child_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='child_record')
+    list_field = models.ForeignKey('ListField', on_delete=models.SET_NULL, null=True, related_name='list_field')
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    RECORD_RELATION_TYPE = (
+        ('choose-from-list', 'Choose from list'),
+        ('embed', 'Embed'),
+        ('tag', 'Tag'),
+    )
+
+    relation_type = models.CharField(
+        max_length=25,
+        choices=RECORD_RELATION_TYPE,
+        blank=False,
+        default='active',
+    )
+
+    RECORD_RELATION_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=RECORD_RELATION_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Task(models.Model):
+    task = HTMLField()
+    record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    TASK_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=TASK_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class Note(models.Model):
+    note = HTMLField()
+    record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    NOTE_STATUS = (
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+        ('deleted', 'Deleted'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=NOTE_STATUS,
+        blank=False,
+        default='active',
+    )
+
+    def __str__(self):
+        return self.name

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import modelformset_factory
-from .models import Organization, App, List, ListField
+from .models import Organization, App, List, ListField, Task, Note
 
 
 class OrganizationForm(forms.ModelForm):
@@ -50,7 +50,8 @@ ListFieldFormset = modelformset_factory(
     widgets = {
         'field_label': forms.TextInput(attrs={
             'class': 'form-control form-control-solid py-1',
-            'placeholder': 'Enter a label for this field'
+            'placeholder': 'Enter a label for this field',
+            'required': '',
             }
         ),
         'field_type': forms.Select(attrs={
@@ -72,3 +73,23 @@ ListFieldFormset = modelformset_factory(
         )
     }
 )
+
+class TaskForm(forms.ModelForm): #(Workspaces)
+
+    class Meta:
+        model = Task
+        fields = ('task',)
+
+        widgets = {
+            'task': forms.TextInput(attrs={'class':'form-control form-control-solid'})
+        }
+
+class NoteForm(forms.ModelForm): #(Workspaces)
+
+    class Meta:
+        model = Note
+        fields = ('note',)
+
+        widgets = {
+            'note': forms.TextInput(attrs={'class':'form-control form-control-solid'})
+        }
