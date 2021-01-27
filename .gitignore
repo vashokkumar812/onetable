@@ -1,0 +1,13 @@
+# Text backup files
+*.bak
+
+# Database
+*.sqlite3
+
+*.pyc
+.DS_Store
+*.swp
+/venv/
+/static/
+/media/
+.env

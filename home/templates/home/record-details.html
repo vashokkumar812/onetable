@@ -1,0 +1,140 @@
+<div class="row mb-5">
+  <div class="col-xl-12">
+      <!-- Account details card-->
+      <div class="card card-header-actions">
+          <div class="card-header bg-white">
+              {{ record.primary_field.value }}
+              <div class="dropdown no-caret">
+                  <button class="btn btn-transparent-dark btn-icon dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-bars"></i></button>
+                  <div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="{% url 'edit_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=record.pk %}">
+                        <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="list"></i></div>
+                        Edit Record
+                    </a>
+                    <a class="dropdown-item" href="{% url 'archive_record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=record.pk %}">
+                        <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="list"></i></div>
+                        Archive Record
+                    </a>
+                  </div>
+              </div>
+          </div>
+          <div class="card-body">
+            {% if record.record_fields %}
+              {% for field in record.record_fields %}
+                {% if field.list_field.primary is False %}
+                  {% if field.list_field.field_type == "choose-from-list" %}
+                    <p><b>{{ field.list_field.field_label }}:</b>
+                      {% if field.selected_record.status == 'active' %}
+                      <a href="{% url 'record' organization_pk=organization.pk app_pk=app.pk list_pk=list.pk record_pk=field.selected_record.pk %}">
+                        <span class="badge badge-primary p-2">{{ field.selected_record.primary_field.value }}
+                        </span>
+                      </a>
+                      {% endif %}
+                    </p>
+                  {% elif field.list_field.field_type == "url" %}
+                    <p><b>{{ field.list_field.field_label }}:</b> <a href="{{ field.value }}" target="_blank">{{ field.value }}</a></p>
+                  {% else %}
+                    <p><b>{{ field.list_field.field_label }}:</b> {{ field.value }}</p>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+      </div>
+  </div>
+</div>
+<div class="p-5 container">
+<h5>Comments</h5>
+<hr/>
+<form id="post_record_comment" method="POST" action="{% url 'post_record_comments' organization.pk app.pk list.pk record.pk %}">
+{% csrf_token %}
+<input id="content" class="form-control bg-light mb-3" name="content" type="text" placeholder="Enter a comment here"/>
+<div class="text-right"><input class="btn btn-primary" type="submit"></div>
+</form>
+<div class="d-block" id="record_comments">
+{% for comment in comments %}
+<div class="card text-center m-3"><div class="card-body"><p class="card-text text-left">{{comment.content}}</p></div><div class="card-footer bg-white"><input class="btn btn-link float-right" type="button" value="Remove"><input class="btn btn-link float-right" type="button" value="edit"></div></div>
+{% endfor %}
+</div>
+</div>
+<script>
+$(document).ready(function(){
+    
+  
+     $(function () {
+    var frm = $('#post_record_comment');
+    frm.value='';
+    var record_comments= $('#record_comments');
+    
+    frm.submit(function (ev) {
+      console.log(frm.serialize('content'));
+      function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});g
+
+function getCookie(c_name) {
+    var c_value = " " + document.cookie;
+    var c_start = c_value.indexOf(" " + c_name + "=");
+    if (c_start == -1) {
+        c_value = null;
+    }
+    else {
+        c_start = c_value.indexOf("=", c_start) + 1;
+        var c_end = c_value.indexOf(";", c_start);
+        if (c_end == -1) {
+            c_end = c_value.length;
+        }
+        c_value = unescape(c_value.substring(c_start,c_end));
+    }
+    return c_value;
+}
+
+        let cookie = document.cookie;
+        let csrfToken = getCookie('csrftoken');
+
+        $.ajax({
+          
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            headers: {
+           'X-CSRFToken': csrfToken
+         },
+            success: function (data) {
+              var content = $('#content').val();
+              $('#content').val('');
+              var comment_div='<div class="card text-center m-3"><div class="card-body"><p class="card-text text-left">'+content+'</p></div><div class="card-footer bg-white"><input class="btn btn-link float-right" type="button" value="Remove"><input class="btn btn-link float-right" type="button" value="edit"></div></div>';
+              record_comments.prepend(comment_div);
+            }
+        });
+        ev.preventDefault();
+    });
+});
+})
+</script>
