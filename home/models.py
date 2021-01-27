@@ -271,9 +271,19 @@ class Record(models.Model):
         return str(self.id)
 
 
+
+class RecordComment(models.Model):
+    record = models.ForeignKey(Record,on_delete=models.CASCADE,null=True,blank=True)
+    content = models.TextField(default='')
+    created_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        content = (self.content[:10] + '..') if len(self.content) > 10 else self.content
+        return (content + ' by ' + self.created_user.username +' of #'+ str(self.record.pk))
+
 class RecordField(models.Model):
     record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='record')
-    list_field = models.ForeignKey('ListField', on_delete=models.SET_NULL, null=True)
+    list_field = models.ForeignKey(ListField, on_delete=models.SET_NULL, null=True)
     value = models.TextField(null=True)
     selected_record = models.ForeignKey('Record', on_delete=models.SET_NULL, null=True, related_name='selected_record')
     created_at = models.DateTimeField(auto_now_add=True, null=False)
