@@ -10,8 +10,8 @@ from django.core import serializers
 import uuid
 import random
 import string
-
-from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField, RecordRelation
+from django.core import serializers
+from .models import Organization, OrganizationUser, App, AppUser, Menu, List, ListField, Record, RecordField, RecordRelation,RecordComment
 from .forms import OrganizationForm, AppForm, ListForm, ListFieldFormset, TaskForm, NoteForm
 
 # TODO
@@ -850,7 +850,7 @@ def save_record(request, organization_pk, app_pk, list_pk):
 
 @login_required
 def record(request, organization_pk, app_pk, list_pk, record_pk):
-
+    comments = RecordComment.objects.filter(record_id=record_pk).order_by('-pk')
     # Record details page (placeholder for now)
     organization = get_object_or_404(Organization, pk=organization_pk)
     app = get_object_or_404(App, pk=app_pk)
@@ -886,7 +886,8 @@ def record(request, organization_pk, app_pk, list_pk, record_pk):
             'list': list,
             'record': record,
             'type': 'record',
-            'record_view': 'record-details'
+            'record_view': 'record-details',
+            "comments":comments
         }
 
         return render(request, 'home/workspace.html', context=context)
@@ -901,11 +902,11 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
     list = get_object_or_404(List, pk=list_pk)
     record = get_object_or_404(Record, pk=record_pk)
     note_form = NoteForm()
-
+    comments = RecordComment.objects.filter(record_id=record_pk).order_by('-pk')
     if request.is_ajax() and request.method == "GET":
 
         # Call is ajax, just load main content needed here
-
+        
         html = render_to_string(
             template_name="home/record-details.html",
             context={
@@ -913,7 +914,8 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
                 'app': app,
                 'list': list,
                 'record': record,
-                'note_form': note_form
+                'note_form': note_form,
+                
 
             }
         )
@@ -935,7 +937,8 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
             'record': record,
             'note_form': note_form,
             'type': 'record',
-            'record_view': 'record-details'
+            'record_view': 'record-details',
+            "comments":comments
         }
 
         return render(request, 'home/workspace.html', context=context)
@@ -954,7 +957,7 @@ def record_details(request, organization_pk, app_pk, list_pk, record_pk):
                 'record': record,
                 'note_form': note_form,
                 'type': 'record',
-                'record_view': 'record-details'
+                'record_view': 'record-details',
             }
 
             return render(request, 'home/workspace.html', context=context)
@@ -1159,3 +1162,19 @@ def generate_random_string(string_length=10):
 
 def randStr(chars = string.ascii_uppercase + string.ascii_lowercase + string.digits, N=10):
 	return ''.join(random.choice(chars) for _ in range(N))
+
+
+def post_record_comment(request,organization_pk, app_pk, list_pk, record_pk):
+    if request.method == "POST":
+        if request.POST['content'] != '':
+            record_comment = RecordComment(created_user=request.user,content = request.POST['content'],record_id=record_pk)
+            record_comment.save()
+            data_dict={}
+        
+            myarray = serializers.serialize("json", [record_comment],ensure_ascii=False)
+            json=myarray[1:-1]
+            return JsonResponse(data=json, safe=False)
+        else:
+            return HttpResponse('Unauthorized', status=401)
+    else:
+        return HttpResponse('Unauthorized', status=401)
